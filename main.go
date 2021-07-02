@@ -59,11 +59,10 @@ func main() {
 								"type": "text",
 								"text": "site",
 								"size": "xl",
-								"color": "#ffffff",
+								"color": "#fffff0",
 								"align": "center"
 							}
 							],
-							"backgroundColor": "#666666"
 						},
 						"body": {
 							"type": "box",
