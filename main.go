@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/line/line-bot-sdk-go/linebot"
@@ -65,8 +66,8 @@ func main() {
 							"this is a confirm template",
 							linebot.NewConfirmTemplate(
 								"本を積みますか?サイトを積みますか??",
-								linebot.NewMessageAction("本", "book"),
-								linebot.NewMessageAction("サイト", "site"),
+								linebot.NewMessageAction("本", "本"),
+								linebot.NewMessageAction("サイト", "サイト"),
 							),
 						)
 
@@ -342,8 +343,21 @@ func main() {
 						).Do(); err4 != nil {
 							fmt.Println(err4)
 						}
+					} else if message.Text == "サイト" {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("URLちょうだい！")).Do(); err != nil {
+							log.Print(err)
+						}
+					} else if message.Text == "本" {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("タイトルを教えて")).Do(); err != nil {
+							log.Print(err)
+						}
+						//ここで 積ん読追加のAPIを呼ぶ、著者とタイトル、どう判断すべきか分からん
+					} else if strings.Contains(message.Text, "http") {
+						url := message.Text
+						fmt.Println(url)
+						//ここで 積んサイト追加のAPIを呼ぶ
 					} else {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("ありがとう")).Do(); err != nil {
 							log.Print(err)
 						}
 					}
