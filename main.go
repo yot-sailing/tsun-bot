@@ -382,7 +382,7 @@ func main() {
 
 				}
 			} else if event.Type == linebot.EventTypePostback {
-				fmt.Println(event.Postback.Params.Date)
+				fmt.Println(event.Postback.Params)
 			}
 		}
 	})
