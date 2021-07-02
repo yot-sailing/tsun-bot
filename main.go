@@ -41,11 +41,37 @@ func main() {
 				switch message := event.Message.(type) {
 				case *linebot.TextMessage:
 					if message.Text == "今暇" {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("何分くらい暇？")).Do(); err != nil {
+						// if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("何分暇??")).Do(); err != nil {
+						// 	log.Print(err)
+						// }
+						resp := linebot.NewTemplateMessage(
+							"this is a buttons template",
+							linebot.NewButtonsTemplate(
+								"https://farm5.staticflickr.com/4849/45718165635_328355a940_m.jpg",
+								"Menu",
+								"何分暇か選んでね",
+								linebot.NewDatetimePickerAction("Time", "action=sel&only=time", "time", "", "23:59", "00:00"),
+								// linebot.NewDatetimePickerAction("DateTime", "action=sel", "datetime", "2017-09-01T12:00", "", ""),
+							),
+						)
+
+						_, err = bot.ReplyMessage(event.ReplyToken, resp).Do()
+						if err != nil {
 							log.Print(err)
 						}
 					} else if message.Text == "積みます" {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("何を積みましたか")).Do(); err != nil {
+
+						resp := linebot.NewTemplateMessage(
+							"this is a confirm template",
+							linebot.NewConfirmTemplate(
+								"本を積みますか?サイトを積みますか??",
+								linebot.NewMessageAction("本", "book"),
+								linebot.NewMessageAction("サイト", "site"),
+							),
+						)
+
+						_, err = bot.ReplyMessage(event.ReplyToken, resp).Do()
+						if err != nil {
 							log.Print(err)
 						}
 					} else if message.Text == "今の積ん読リストを見せて" {
