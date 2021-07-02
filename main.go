@@ -57,20 +57,7 @@ func main() {
 					jsonData := []byte(`
 					{
 						"type": "bubble",
-						"hero": {
-						  "type": "box",
-						  "layout": "vertical",
-						  "contents": [
-							{
-							  "type": "text",
-							  "text": "site",
-							  "size": "xl",
-							  "color": "#ffffff",
-							  "align": "center"
-							}
-						  ],
-						  "backgroundColor": "#666666"
-						},
+						
 						"body": {
 						  "type": "box",
 						  "layout": "vertical",
@@ -257,3 +244,18 @@ func main() {
 // 	c.Container = container
 // 	return nil
 // }
+
+// "hero": {
+// 	"type": "box",
+// 	"layout": "vertical",
+// 	"contents": [
+// 	  {
+// 		"type": "text",
+// 		"text": "site",
+// 		"size": "xl",
+// 		"color": "#ffffff",
+// 		"align": "center"
+// 	  }
+// 	],
+// 	"backgroundColor": "#666666"
+//   },
