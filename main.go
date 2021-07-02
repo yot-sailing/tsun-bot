@@ -169,6 +169,7 @@ func main() {
 					container, err_f := linebot.UnmarshalFlexMessageJSON(jsonData)
 					if err_f != nil {
 						fmt.Println("could not read json data")
+						fmt.Println(err_f)
 					}
 					if _, err4 := bot.ReplyMessage(
 						event.ReplyToken,
