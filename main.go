@@ -50,10 +50,32 @@ func main() {
 					}
 					jsonData := []byte(`
 					{
+						"type": "bubble",
+						"hero": {
+						  "type": "box",
+						  "layout": "vertical",
+						  "contents": [
+							{
+							  "type": "text",
+							  "text": "site",
+							  "size": "xl",
+							  "color": "#ffffff",
+							  "align": "center"
+							}
+						  ],
+						  "backgroundColor": "#666666"
+						},
 						"body": {
 						  "type": "box",
 						  "layout": "vertical",
 						  "contents": [
+							{
+							  "type": "text",
+							  "text": "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話",
+							  "weight": "bold",
+							  "size": "xl",
+							  "wrap": true
+							},
 							{
 							  "type": "box",
 							  "layout": "vertical",
