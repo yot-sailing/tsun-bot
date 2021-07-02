@@ -51,19 +51,6 @@ func main() {
 					"contents": [
 						{
 						"type": "bubble",
-						"hero": {
-							"type": "box",
-							"layout": "vertical",
-							"contents": [
-							{
-								"type": "text",
-								"text": "site",
-								"size": "xl",
-								"color": "#fffff0",
-								"align": "center"
-							}
-							],
-						},
 						"body": {
 							"type": "box",
 							"layout": "vertical",
