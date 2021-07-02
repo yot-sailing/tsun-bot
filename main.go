@@ -12,6 +12,7 @@ import (
 )
 
 func main() {
+	want_added := false
 	err0 := godotenv.Load(fmt.Sprintf("%s.env", os.Getenv("GO_ENV")))
 	if err0 != nil {
 		fmt.Println("could not load env file")
@@ -42,9 +43,7 @@ func main() {
 				switch message := event.Message.(type) {
 				case *linebot.TextMessage:
 					if message.Text == "今暇" {
-						// if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("何分暇??")).Do(); err != nil {
-						// 	log.Print(err)
-						// }
+						want_added = false
 						resp := linebot.NewTemplateMessage(
 							"this is a buttons template",
 							linebot.NewButtonsTemplate(
@@ -61,13 +60,12 @@ func main() {
 							log.Print(err)
 						}
 					} else if message.Text == "積みます" {
-
 						resp := linebot.NewTemplateMessage(
 							"this is a confirm template",
 							linebot.NewConfirmTemplate(
 								"本を積みますか?サイトを積みますか??",
-								linebot.NewMessageAction("本", "本"),
-								linebot.NewMessageAction("サイト", "サイト"),
+								linebot.NewMessageAction("book", "本"),
+								linebot.NewMessageAction("site", "サイト"),
 							),
 						)
 
@@ -76,6 +74,7 @@ func main() {
 							log.Print(err)
 						}
 					} else if message.Text == "今の積ん読リストを見せて" {
+						want_added = false
 						//ここでAPIを呼び出す
 						jsonData := []byte(`
 					{
@@ -347,18 +346,34 @@ func main() {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("URLちょうだい！")).Do(); err != nil {
 							log.Print(err)
 						}
+						want_added = true
 					} else if message.Text == "本" {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("タイトルを教えて")).Do(); err != nil {
 							log.Print(err)
 						}
-						//ここで 積ん読追加のAPIを呼ぶ、著者とタイトル、どう判断すべきか分からん
+						want_added = true
+						//ここで 積ん読追加のAPIを呼ぶ、著者とタイトル、どう判断すべきか分からんからタイトルだけで
 					} else if strings.Contains(message.Text, "http") {
 						url := message.Text
 						fmt.Println(url)
 						//ここで 積んサイト追加のAPIを呼ぶ
-					} else {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("ありがとう")).Do(); err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
 							log.Print(err)
+						}
+					} else {
+						if want_added {
+							title := message.Text
+							fmt.Println(title)
+							want_added = false
+							//ここで 積ん読追加のAPIを呼ぶ
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
+								log.Print(err)
+							}
+						} else {
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
+								log.Print(err)
+							}
+							want_added = false // ほんま？？
 						}
 					}
 				case *linebot.StickerMessage:
