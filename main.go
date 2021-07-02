@@ -40,12 +40,17 @@ func main() {
 			if event.Type == linebot.EventTypeMessage {
 				switch message := event.Message.(type) {
 				case *linebot.TextMessage:
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
-						log.Print(err)
-					}
-				case *linebot.StickerMessage:
-					//ここでAPIを呼び出す
-					jsonData := []byte(`
+					if message.Text == "今暇" {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("何分くらい暇？")).Do(); err != nil {
+							log.Print(err)
+						}
+					} else if message.Text == "積みます" {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("何を積みましたか")).Do(); err != nil {
+							log.Print(err)
+						}
+					} else if message.Text == "今の積ん読リストを見せて" {
+						//ここでAPIを呼び出す
+						jsonData := []byte(`
 					{
 					"type": "carousel",
 					"contents": [
@@ -301,15 +306,24 @@ func main() {
 					]
 					}
 					`)
-					container, err_f := linebot.UnmarshalFlexMessageJSON(jsonData)
-					if err_f != nil {
-						fmt.Println("could not read json data because of ", err_f)
+						container, err_f := linebot.UnmarshalFlexMessageJSON(jsonData)
+						if err_f != nil {
+							fmt.Println("could not read json data because of ", err_f)
+						}
+						if _, err4 := bot.ReplyMessage(
+							event.ReplyToken,
+							linebot.NewFlexMessage("tsuntsun-list", container),
+						).Do(); err4 != nil {
+							fmt.Println(err4)
+						}
+					} else {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
+							log.Print(err)
+						}
 					}
-					if _, err4 := bot.ReplyMessage(
-						event.ReplyToken,
-						linebot.NewFlexMessage("tsuntsun-list", container),
-					).Do(); err4 != nil {
-						fmt.Println(err4)
+				case *linebot.StickerMessage:
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("スタンプよりも積ん読消化して")).Do(); err != nil {
+						log.Print(err)
 					}
 
 				}
