@@ -50,8 +50,8 @@ func main() {
 								"https://farm5.staticflickr.com/4849/45718165635_328355a940_m.jpg",
 								"Menu",
 								"何分暇か選んでね",
-								linebot.NewDatetimePickerAction("Time", "action=sel&only=time", "time", "", "23:59", "00:00"),
-								// linebot.NewDatetimePickerAction("DateTime", "action=sel", "datetime", "2017-09-01T12:00", "", ""),
+								linebot.NewDatetimePickerAction("Time", "datetimepicker", "time", "", "23:59", "00:00"),
+								linebot.NewDatetimePickerAction("DateTime", "action=sel", "datetime", "2017-09-01T12:00", "", ""),
 							),
 						)
 
@@ -64,8 +64,8 @@ func main() {
 							"this is a confirm template",
 							linebot.NewConfirmTemplate(
 								"本を積みますか?サイトを積みますか??",
-								linebot.NewMessageAction("book", "本"),
-								linebot.NewMessageAction("site", "サイト"),
+								linebot.NewMessageAction("本", "本"),
+								linebot.NewMessageAction("サイト", "サイト"),
 							),
 						)
 
