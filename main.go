@@ -51,7 +51,6 @@ func main() {
 								"Menu",
 								"何分暇か選んでね",
 								linebot.NewDatetimePickerAction("Time", "datetimepicker", "time", "", "23:59", "00:00"),
-								linebot.NewDatetimePickerAction("DateTime", "action=sel", "datetime", "2017-09-01T12:00", "", ""),
 							),
 						)
 
@@ -382,6 +381,8 @@ func main() {
 					}
 
 				}
+			} else if event.Type == linebot.EventTypePostback {
+				fmt.Println(event.Postback.Data)
 			}
 		}
 	})
