@@ -46,6 +46,7 @@ func main() {
 				case *linebot.StickerMessage:
 					//ここでAPIを呼び出す
 					jsonData := []byte(`
+					{
 					"type": "carousel",
 					"contents": [
 						{
