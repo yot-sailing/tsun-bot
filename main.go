@@ -48,6 +48,12 @@ func main() {
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(message.Text)).Do(); err != nil {
 						log.Print(err)
 					}
+				case *linebot.StickerMessage:
+					// replyMessage := fmt.Sprintf(
+					// 	"sticker id is %s, stickerResourceType is %s", message.StickerID, message.StickerResourceType)
+					// if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
+					// 	log.Print(err)
+					// }
 					jsonData := []byte(`
 					{
 						"type": "bubble",
@@ -199,12 +205,7 @@ func main() {
 					).Do(); err4 != nil {
 						fmt.Println(err4)
 					}
-				case *linebot.StickerMessage:
-					replyMessage := fmt.Sprintf(
-						"sticker id is %s, stickerResourceType is %s", message.StickerID, message.StickerResourceType)
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(replyMessage)).Do(); err != nil {
-						log.Print(err)
-					}
+
 				}
 			}
 		}
