@@ -51,6 +51,20 @@ func main() {
 					"contents": [
 						{
 						"type": "bubble",
+						"hero": {
+							"type": "box",
+							"layout": "vertical",
+							"contents": [
+							{
+								"type": "text",
+								"text": "site",
+								"size": "xl",
+								"color": "#ffffff",
+								"align": "center"
+							}
+							],
+							"backgroundColor": "#666666"
+						},
 						"body": {
 							"type": "box",
 							"layout": "vertical",
@@ -181,123 +195,123 @@ func main() {
 						  "layout": "vertical",
 						  "contents": [
 							{
-							  "type": "text",
-							  "text": "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話",
-							  "weight": "bold",
-							  "size": "xl",
-							  "wrap": true
+								"type": "text",
+								"text": "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話",
+								"weight": "bold",
+								"size": "xl",
+								"wrap": true
 							},
 							{
-							  "type": "box",
-							  "layout": "vertical",
-							  "margin": "lg",
-							  "spacing": "sm",
-							  "contents": [
+								"type": "box",
+								"layout": "vertical",
+								"margin": "lg",
+								"spacing": "sm",
+								"contents": [
 								{
-								  "type": "box",
-								  "layout": "baseline",
-								  "spacing": "sm",
-								  "contents": [
+									"type": "box",
+									"layout": "baseline",
+									"spacing": "sm",
+									"contents": [
 									{
-									  "type": "text",
-									  "text": "URL",
-									  "color": "#aaaaaa",
-									  "size": "sm",
-									  "flex": 2
+										"type": "text",
+										"text": "URL",
+										"color": "#aaaaaa",
+										"size": "sm",
+										"flex": 2
 									},
 									{
-									  "type": "text",
-									  "text": "http://localhost:8080",
-									  "wrap": true,
-									  "color": "#666666",
-									  "size": "sm",
-									  "flex": 5
+										"type": "text",
+										"text": "http://localhost:8080",
+										"wrap": true,
+										"color": "#666666",
+										"size": "sm",
+										"flex": 5
 									}
-								  ]
+								]
 								},
 								{
-								  "type": "box",
-								  "layout": "baseline",
-								  "spacing": "sm",
-								  "contents": [
+									"type": "box",
+									"layout": "baseline",
+									"spacing": "sm",
+									"contents": [
 									{
-									  "type": "text",
-									  "text": "created",
-									  "color": "#aaaaaa",
-									  "size": "sm",
-									  "flex": 2,
-									  "wrap": true
+										"type": "text",
+										"text": "created",
+										"color": "#aaaaaa",
+										"size": "sm",
+										"flex": 2,
+										"wrap": true
 									},
 									{
-									  "type": "text",
-									  "text": "2021/07/02",
-									  "wrap": true,
-									  "color": "#666666",
-									  "size": "sm",
-									  "flex": 5
+										"type": "text",
+										"text": "2021/07/02",
+										"wrap": true,
+										"color": "#666666",
+										"size": "sm",
+										"flex": 5
 									}
-								  ]
+								]
 								},
 								{
-								  "type": "box",
-								  "layout": "baseline",
-								  "spacing": "sm",
-								  "contents": [
+									"type": "box",
+									"layout": "baseline",
+									"spacing": "sm",
+									"contents": [
 									{
-									  "type": "text",
-									  "text": "total time",
-									  "color": "#aaaaaa",
-									  "size": "sm",
-									  "flex": 2,
-									  "wrap": true
+										"type": "text",
+										"text": "total time",
+										"color": "#aaaaaa",
+										"size": "sm",
+										"flex": 2,
+										"wrap": true
 									},
 									{
-									  "type": "text",
-									  "text": "5min",
-									  "wrap": true,
-									  "color": "#666666",
-									  "size": "sm",
-									  "flex": 5
+										"type": "text",
+										"text": "5min",
+										"wrap": true,
+										"color": "#666666",
+										"size": "sm",
+										"flex": 5
 									}
-								  ]
+								]
 								}
-							  ]
+							]
 							}
-						  ]
+						]
 						},
 						"footer": {
-						  "type": "box",
-						  "layout": "vertical",
-						  "spacing": "sm",
-						  "contents": [
+							"type": "box",
+							"layout": "vertical",
+							"spacing": "sm",
+							"contents": [
 							{
-							  "type": "button",
-							  "style": "link",
-							  "height": "sm",
-							  "action": {
+								"type": "button",
+								"style": "link",
+								"height": "sm",
+								"action": {
 								"type": "uri",
 								"label": "read now",
 								"uri": "https://linecorp.com"
-							  }
+							}
 							},
 							{
-							  "type": "button",
-							  "style": "link",
-							  "height": "sm",
-							  "action": {
+								"type": "button",
+								"style": "link",
+								"height": "sm",
+								"action": {
 								"type": "uri",
 								"label": "already read",
 								"uri": "https://linecorp.com"
-							  }
+							}
 							},
 							{
-							  "type": "spacer",
-							  "size": "sm"
+								"type": "spacer",
+								"size": "sm"
 							}
-						  ],
-						  "flex": 0
+						],
+						"flex": 0
 						}
-					  }
+					}
 					]
 					}
 					`)
@@ -307,7 +321,7 @@ func main() {
 					}
 					if _, err4 := bot.ReplyMessage(
 						event.ReplyToken,
-						linebot.NewFlexMessage("alt text", container),
+						linebot.NewFlexMessage("tsuntsun-list", container),
 					).Do(); err4 != nil {
 						fmt.Println(err4)
 					}
@@ -320,18 +334,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
-// "hero": {
-// 	"type": "box",
-// 	"layout": "vertical",
-// 	"contents": [
-// 	  {
-// 		"type": "text",
-// 		"text": "site",
-// 		"size": "xl",
-// 		"color": "#ffffff",
-// 		"align": "center"
-// 	  }
-// 	],
-// 	"backgroundColor": "#666666"
-//   },
