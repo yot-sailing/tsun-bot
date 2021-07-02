@@ -48,8 +48,8 @@ func main() {
 							"this is a buttons template",
 							linebot.NewButtonsTemplate(
 								"https://farm5.staticflickr.com/4849/45718165635_328355a940_m.jpg",
-								"Menu",
-								"何分暇か選んでね",
+								"積ん読消化！！",
+								"何時間何分暇か選んでね",
 								linebot.NewDatetimePickerAction("Time", "datetimepicker", "time", "", "23:59", "00:00"),
 							),
 						)
