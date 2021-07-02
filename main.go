@@ -384,7 +384,7 @@ func main() {
 			} else if event.Type == linebot.EventTypePostback {
 				fmt.Println(event.Postback.Params)
 				//ここで何分で読めるサイトかを提案するAPIを呼び出す
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(event.Postback.Params.Time+"分暇なのね")).Do(); err != nil {
+				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(event.Postback.Params.Time[:2]+"時間"+event.Postback.Params.Time[3:]+"分暇なのね")).Do(); err != nil {
 					log.Print(err)
 				}
 			}
