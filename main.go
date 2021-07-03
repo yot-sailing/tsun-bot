@@ -11,8 +11,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/joho/godotenv"
 	"github.com/line/line-bot-sdk-go/linebot"
+	"github.com/yukihir0/gec"
 )
 
 type Tsundoku struct {
@@ -278,22 +280,22 @@ func main() {
 					} else if strings.Contains(message.Text, "http") {
 						tsumu_url := message.Text
 						fmt.Println(tsumu_url)
-						//ここで 積んサイト追加のAPIを呼ぶ
+						// URLからタイトルと本文の長さを取得する
+						doc, err := goquery.NewDocument(tsumu_url)
+						if err != nil {
+							fmt.Println("err", err)
+						}
+						html, err := doc.Html()
+						if err != nil {
+							fmt.Println("err", err)
+						}
+						opt := gec.NewOption()
+						content, title := gec.Analyse(html, opt)
 						args := url.Values{}
 						args.Add("category", "site")
 						args.Add("url", tsumu_url)
-						if resp, err := http.Get(tsumu_url); err != nil {
-							fmt.Println("error:http get\n", err)
-						} else {
-							defer resp.Body.Close()
-							byteArray, _ := ioutil.ReadAll(resp.Body)
-							res_str := string(byteArray)
-							fmt.Println(res_str)
-							if err != nil {
-								fmt.Println(err)
-								return
-							}
-						}
+						args.Add("title", title)
+						args.Add("required_time", content)
 						_, err := http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
 						if err != nil {
 							fmt.Println("Request error:", err)
