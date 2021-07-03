@@ -408,12 +408,175 @@ func main() {
 				fmt.Println(event.Postback.Params)
 				fmt.Println(event.Postback)
 				if event.Postback.Data == "time" {
-					//ここで何分で読めるサイトかを提案するAPIを呼び出す
-					resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/time/" + event.Postback.Params.Time)
+					limited_results := []Tsundoku{}
+					free_time := event.Postback.Params.Time[:2] + event.Postback.Params.Time[3:]
+					resp, err := http.Get("http://localhost:49209/api/users/1/time/" + free_time)
 					if err != nil {
 						fmt.Println(err)
+						return
 					} else {
-						fmt.Println(resp)
+						defer resp.Body.Close()
+						byteArray, _ := ioutil.ReadAll(resp.Body)
+						err := json.Unmarshal(byteArray, &limited_results)
+						if err != nil {
+							fmt.Println(err)
+						}
+					}
+					jsonData := (`
+									{
+									"type": "carousel",
+									"contents": [`)
+					for i, a := range limited_results {
+						column1 := "URL"
+						column2 := "total time"
+						image_url := "https://pakutaso.cdn.rabify.me/shared/img/thumb/macbookFTHG1289.jpg?d=350" // pc用
+						jsonData += (`
+								{
+								"type": "bubble",
+								"hero": {
+									"type": "image",
+									"url": "` + image_url + `",
+									"size": "full",
+									"aspectRatio": "20:13",
+									"aspectMode": "cover"
+								},
+								"body": {
+									"type": "box",
+									"layout": "vertical",
+									"contents": [
+									{
+										"type": "text",
+										"text": "` + a.Title + `",
+										"weight": "bold",
+										"size": "xl",
+										"wrap": true
+									},
+									{
+										"type": "box",
+										"layout": "vertical",
+										"margin": "lg",
+										"spacing": "sm",
+										"contents": [
+										{
+											"type": "box",
+											"layout": "baseline",
+											"spacing": "sm",
+											"contents": [
+											{
+												"type": "text",
+												"text": "` + column1 + `",
+												"color": "#aaaaaa",
+												"size": "sm",
+												"flex": 2
+											},
+											{
+											  "type": "text",
+											  "text": "` + a.URL + `",
+											  "wrap": true,
+											  "color": "#666666",
+											  "size": "sm",
+											  "flex": 5
+											}
+										  ]
+										},
+										{
+										  "type": "box",
+										  "layout": "baseline",
+										  "spacing": "sm",
+										  "contents": [
+											{
+											  "type": "text",
+											  "text": "created",
+											  "color": "#aaaaaa",
+											  "size": "sm",
+											  "flex": 2,
+											  "wrap": true
+											},
+											{
+											  "type": "text",
+											  "text" : "` + a.CreatedAt.String()[:10] + `", 
+											  "wrap": true,
+											  "color": "#666666",
+											  "size": "sm",
+											  "flex": 5
+											}
+										  ]
+										},
+										{
+										  "type": "box",
+										  "layout": "baseline",
+										  "spacing": "sm",
+										  "contents": [
+											{
+											  "type": "text",
+											  "text": "` + column2 + `",
+											  "color": "#aaaaaa",
+											  "size": "sm",
+											  "flex": 2,
+											  "wrap": true
+											},
+											{
+											  "type": "text",
+											  "text": "` + a.RequiredTime + `" ,
+											  "wrap": true,
+											  "weight": "bold",
+											  "color": "#ef93b6",
+											  "size": "sm",
+											  "flex": 5
+											}
+										  ]
+										}
+									  ]
+									}
+								  ]
+								},
+								"footer": {
+									"type": "box",
+									"layout": "vertical",
+									"spacing": "sm",
+									"contents": [
+									{
+									"type": "button",
+									"style": "link",
+									"height": "sm",
+									"action": {
+										"type": "uri",
+										"label": "read now",
+										"uri": "` + a.URL + `"
+									}
+									},
+									{
+										"type": "button",
+										"style": "link",
+										"height": "sm",
+										"action": {
+											"type": "message",
+											"label": "already read",
+											"text": "already read : tsundokuID ` + strconv.Itoa(a.ID) + `"
+										}
+										},
+									{
+										"type": "spacer",
+										"size": "sm"
+									}
+									],
+									"flex": 0
+									}
+								}`)
+						if i != len(limited_results)-1 {
+							jsonData += ","
+						}
+					}
+					jsonData += "]}"
+					container, err_f := linebot.UnmarshalFlexMessageJSON([]byte(jsonData))
+					if err_f != nil {
+						fmt.Println("could not read json data because of ", err_f)
+					}
+					if _, err4 := bot.ReplyMessage(
+						event.ReplyToken,
+						linebot.NewFlexMessage("tsuntsun-list", container),
+					).Do(); err4 != nil {
+						fmt.Println(err4)
 					}
 				} else if event.Postback.Data == "date" && title_added {
 					args := url.Values{}
