@@ -296,7 +296,7 @@ func main() {
 						args.Add("category", "site")
 						args.Add("url", tsumu_url)
 						args.Add("title", title)
-						args.Add("required_time", strconv.Itoa(len(content)/500)+"min")
+						args.Add("requiredTime", strconv.Itoa(len(content)/500)+"min")
 						fmt.Println(strconv.Itoa(len(content)/500) + "min")
 						_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
 						if err != nil {
