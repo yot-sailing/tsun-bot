@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -89,15 +90,6 @@ func main() {
 						}
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
-						var site Tsundoku
-						var book Tsundoku
-						site.Title = "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話"
-						site.Category = "site"
-						site.RequiredTime = "5min"
-						site.URL = "http://localhost:8080"
-						book.Title = "リーダブルコード"
-						book.Category = "book"
-						book.Author = "Trevor Foucher"
 						var results []Tsundoku
 						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus"); err != nil {
 							fmt.Println("error:http get\n", err)
@@ -111,10 +103,7 @@ func main() {
 								return
 							}
 						}
-						yes := []Tsundoku{site, book}
-						fmt.Println(yes)
 						fmt.Println(results)
-						//ここでAPIを呼び出す url = "https://tsuntsun-api.heroku.app.com/users/1/Tsundoku"
 						jsonData := (`
 									{
 									"type": "carousel",
@@ -287,9 +276,21 @@ func main() {
 						want_added = true
 						//ここで 積ん読追加のAPIを呼ぶ、著者とタイトル、どう判断すべきか分からんからタイトルだけで
 					} else if strings.Contains(message.Text, "http") {
-						url := message.Text
-						fmt.Println(url)
+						tsumu_url := message.Text
+						fmt.Println(tsumu_url)
 						//ここで 積んサイト追加のAPIを呼ぶ
+						args := url.Values{}
+						args.Add("category", "site")
+						args.Add("url", tsumu_url)
+						res, _ := http.Get(tsumu_url)
+						fmt.Println(res.Body)
+						_, err := http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
+						if err != nil {
+							fmt.Println("Request error:", err)
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかったわ、ごめん")).Do(); err != nil {
+								log.Print(err)
+							}
+						}
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
 							log.Print(err)
 						}
