@@ -110,6 +110,7 @@ func main() {
 						yes := []Tsundokus{site, book}
 						fmt.Println(yes)
 						results := []Tsundokus{result}
+						fmt.Println(results)
 						//ここでAPIを呼び出す url = "https://tsuntsun-api.heroku.app.com/users/1/tsundokus"
 						jsonData := (`
 									{
