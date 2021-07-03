@@ -90,7 +90,7 @@ func main() {
 					"type": "carousel",
 					"contents": [
 					`)
-						for _, a := range results {
+						for i, a := range results {
 							jsonData += (`
 								{
 								"type": "bubble",
@@ -229,10 +229,14 @@ func main() {
 								  ],
 								  "flex": 0
 								}
-							  },
+							  }
 							`)
+							if i != len(results)-1 {
+								jsonData += ","
+							}
 						}
-
+						// fmt.Println(jsonData)
+						jsonData += "}]}"
 						container, err_f := linebot.UnmarshalFlexMessageJSON([]byte(jsonData))
 						if err_f != nil {
 							fmt.Println("could not read json data because of ", err_f)
