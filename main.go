@@ -110,8 +110,7 @@ func main() {
 						jsonData := (`
 									{
 									"type": "carousel",
-									"contents": [
-									`)
+									"contents": [`)
 						for i, a := range results {
 							column1 := ""
 							column2 := ""
@@ -228,32 +227,30 @@ func main() {
 									"style": "link",
 									"height": "sm",
 									"action": {
-									  "type": "uri",
-									  "label": "read now",
-									  "uri": "` + a.URL + `"
+										"type": "uri",
+										"label": "read now",
+										"uri": "` + a.URL + `"
 									}
-								  },
-								`)
+									},`)
 							}
 							jsonData += (`
 									{
-									  "type": "button",
-									  "style": "link",
-									  "height": "sm",
-									  "action": {
+									"type": "button",
+									"style": "link",
+									"height": "sm",
+									"action": {
 										"type": "button",
 										"label": "already read",
-									  }
+									}
 									},
 									{
-									  "type": "spacer",
-									  "size": "sm"
+										"type": "spacer",
+										"size": "sm"
 									}
-								  ],
-								  "flex": 0
+								],
+								"flex": 0
 								}
-							  }
-							`)
+							}`)
 							if i != len(results)-1 {
 								jsonData += ","
 							}
