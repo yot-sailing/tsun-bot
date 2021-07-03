@@ -417,6 +417,7 @@ func main() {
 					if tsun_book.Author != "" {
 						args.Add("author", tsun_book.Author)
 					}
+					args.Add("deadline", event.Postback.Params.Date)
 					_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
 						log.Print(err)
