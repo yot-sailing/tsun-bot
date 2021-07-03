@@ -99,8 +99,7 @@ func main() {
 						} else {
 							defer resp.Body.Close()
 							byteArray, _ := ioutil.ReadAll(resp.Body)
-							res_str := string(byteArray)
-							err := json.Unmarshal([]byte(res_str), &results)
+							err := json.Unmarshal(byteArray, &results)
 							if err != nil {
 								fmt.Println(err)
 								return
@@ -421,6 +420,12 @@ func main() {
 						if err != nil {
 							fmt.Println(err)
 						}
+					}
+					if len(limited_results) == 0 {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(event.Postback.Params.Time[:2]+"時間"+event.Postback.Params.Time[3:]+"分以内で読めるサイトは無いわ、、")).Do(); err != nil {
+							log.Print(err)
+						}
+						return
 					}
 					jsonData := (`
 									{
