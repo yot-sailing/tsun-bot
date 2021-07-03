@@ -230,11 +230,15 @@ func main() {
 									}
 									},
 									{
-										"type": "postback",
-										"label": "already read!",
-										"data":"read",
-										"height": "sm"
-									},
+										"type": "button",
+										"style": "link",
+										"height": "sm",
+										"action": {
+											"type": "message",
+											"label": "already read",
+											"text": "already read : tsundokuID ` + strconv.Itoa(a.ID) + `"
+										}
+										},
 									{
 										"type": "spacer",
 										"size": "sm"
@@ -255,16 +259,10 @@ func main() {
 									"style": "link",
 									"height": "sm",
 									"action": {
-										"type": "uri",
-										"label": "read now",
-										"uri": "` + a.URL + `"
+										"type": "message",
+										"label": "already read",
+										"text": "already read : tsundokuID ` + strconv.Itoa(a.ID) + `"
 									}
-								},
-								{
-									"type": "postback",
-									"label": "already read!",
-									"data":"read",
-									"height": "sm"
 								},
 								{
 									"type": "spacer",
