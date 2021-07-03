@@ -128,7 +128,7 @@ func main() {
 									"url": "https://imgs.u-note.me/note/caption/47488447.jpg",
 									"size": "full",
 									"aspectRatio": "20:13",
-									"aspectMode": "cover",
+									"aspectMode": "cover"
 								},
 								"body": {
 									"type": "box",
