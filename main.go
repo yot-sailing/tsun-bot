@@ -13,16 +13,16 @@ import (
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
-type Tsundokus struct {
-	ID           int       `gorm:"primary_key" json:"id"`
-	UserID       int       `json:"userID"`
-	Category     string    `gorm:"not null" json:"category"`
-	Title        string    `gorm:"not null" json:"title"`
-	Author       string    `json:"author"`
-	URL          string    `json:"url"`
-	Deadline     time.Time `json:"deadline"`
-	RequiredTime string    `json:"requiredTime"`
-	CreatedAt    time.Time `json:"createdAt"`
+type Tsundoku struct {
+	ID           int
+	UserID       int
+	Category     string
+	Title        string
+	Author       string
+	URL          string
+	Deadline     time.Time
+	RequiredTime string
+	CreatedAt    time.Time
 }
 
 func main() {
@@ -88,8 +88,8 @@ func main() {
 						}
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
-						var site Tsundokus
-						var book Tsundokus
+						var site Tsundoku
+						var book Tsundoku
 						site.Title = "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話"
 						site.Category = "site"
 						site.RequiredTime = "5min"
@@ -97,21 +97,22 @@ func main() {
 						book.Title = "リーダブルコード"
 						book.Category = "book"
 						book.Author = "Trevor Foucher"
-						var result Tsundokus
-						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus"); err != nil {
+						var result Tsundoku
+						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/Tsundoku"); err != nil {
 							fmt.Println("error:http get\n", err)
 						} else {
 							defer resp.Body.Close() //関数終了時の後始末
+							fmt.Println(resp.Body)
 							if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 								fmt.Println("error:json\n", err)
 							}
 							fmt.Println(result.Category)
 						}
-						yes := []Tsundokus{site, book}
+						yes := []Tsundoku{site, book}
 						fmt.Println(yes)
-						results := []Tsundokus{result}
+						results := []Tsundoku{result}
 						fmt.Println(results)
-						//ここでAPIを呼び出す url = "https://tsuntsun-api.heroku.app.com/users/1/tsundokus"
+						//ここでAPIを呼び出す url = "https://tsuntsun-api.heroku.app.com/users/1/Tsundoku"
 						jsonData := (`
 									{
 									"type": "carousel",
