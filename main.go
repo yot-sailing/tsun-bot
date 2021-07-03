@@ -12,12 +12,13 @@ import (
 )
 
 type Tsundokus struct {
-	Title    string
-	Category int // 0 => book, 1 => site
-	URL      string
-	// Author string
+	Title        string
+	Category     int // 0 => book, 1 => site
+	URL          string
+	Author       string
 	RequiredTime string
-	createdAt    string
+	CreatedAt    string
+	DeadLine     string
 }
 
 func main() {
@@ -84,19 +85,34 @@ func main() {
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
 						var site Tsundokus
+						var book Tsundokus
 						site.Title = "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話"
 						site.Category = 1
-						site.createdAt = "2021/07/02"
+						site.CreatedAt = "2021/07/02"
 						site.RequiredTime = "5min"
 						site.URL = "http://localhost:8080"
-						results := []Tsundokus{site, site}
+						book.Title = "リーダブルコード"
+						book.CreatedAt = "2021/03/03"
+						book.Category = 0
+						results := []Tsundokus{site, book}
 						//ここでAPIを呼び出す
 						jsonData := (`
-					{
-					"type": "carousel",
-					"contents": [
-					`)
+									{
+									"type": "carousel",
+									"contents": [
+									`)
 						for i, a := range results {
+							column1 := ""
+							column2 := ""
+							if a.Category == 0 { // if book
+								column1 = "author"
+								column2 = "deadline"
+								a.URL = a.Author //ここちょっと汚い
+								a.RequiredTime = a.DeadLine
+							} else { // if site
+								column1 = "URL"
+								column2 = "total time"
+							}
 							jsonData += (`
 								{
 								"type": "bubble",
@@ -106,9 +122,7 @@ func main() {
 									"contents": [
 									{
 										"type": "text",
-										"text": "` + a.Title + `",`)
-							// "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話"
-							jsonData += (`
+										"text": "` + a.Title + `",
 										"weight": "bold",
 										"size": "xl",
 										"wrap": true
@@ -126,16 +140,14 @@ func main() {
 											"contents": [
 											{
 												"type": "text",
-												"text": "URL",
+												"text": "` + column1 + `",
 												"color": "#aaaaaa",
 												"size": "sm",
 												"flex": 2
 											},
 											{
 											  "type": "text",
-											  "text": "` + a.URL + `",`)
-							//   "http://localhost:8080"
-							jsonData += (`
+											  "text": "` + a.URL + `",
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
@@ -158,9 +170,7 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  "text" : "` + a.createdAt + `", `)
-							//   "text": "2021/07/02"
-							jsonData += (`
+											  "text" : "` + a.CreatedAt + `", 
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
@@ -175,7 +185,7 @@ func main() {
 										  "contents": [
 											{
 											  "type": "text",
-											  "text": "total time",
+											  "text": "` + column2 + `",
 											  "color": "#aaaaaa",
 											  "size": "sm",
 											  "flex": 2,
@@ -183,9 +193,7 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  "text": "` + a.RequiredTime + `" ,`)
-							//   "5min"
-							jsonData += (`
+											  "text": "` + a.RequiredTime + `" ,
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
