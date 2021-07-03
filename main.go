@@ -116,7 +116,7 @@ func main() {
 									a.URL = a.Author //ここちょっと汚い
 								}
 								image_url = "https://imgs.u-note.me/note/caption/47488447.jpg"
-								a.RequiredTime = a.Deadline.String()
+								a.RequiredTime = a.Deadline.String()[:10]
 							} else { // if site
 								column1 = "URL"
 								column2 = "total time"
@@ -185,7 +185,7 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  "text" : "` + a.CreatedAt.String() + `", 
+											  "text" : "` + a.CreatedAt.String()[:10] + `", 
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
