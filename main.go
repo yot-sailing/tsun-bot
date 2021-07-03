@@ -106,6 +106,9 @@ func main() {
 								return
 							}
 						}
+						if len(results) > 12 {
+							results = results[:12]
+						}
 						fmt.Println(results)
 						jsonData := (`
 									{
