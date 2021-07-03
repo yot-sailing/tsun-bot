@@ -285,9 +285,7 @@ func main() {
 								jsonData += ","
 							}
 						}
-						fmt.Println(jsonData)
 						jsonData += "]}"
-						fmt.Println(jsonData)
 						container, err_f := linebot.UnmarshalFlexMessageJSON([]byte(jsonData))
 						if err_f != nil {
 							fmt.Println("could not read json data because of ", err_f)
@@ -344,7 +342,6 @@ func main() {
 						fmt.Println(tsum_del)
 						req, _ := http.NewRequest("DELETE", "https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus/"+strconv.Itoa(tsum_del), nil)
 						req.Header.Set("Accept", "application/json")
-
 						client := new(http.Client)
 						_, err := client.Do(req)
 						if err != nil {
