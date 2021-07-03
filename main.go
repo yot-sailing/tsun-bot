@@ -94,6 +94,8 @@ func main() {
 						book.Title = "リーダブルコード"
 						book.CreatedAt = "2021/03/03"
 						book.Category = 0
+						book.Author = "Trevor Foucher"
+						book.DeadLine = "2021/09/09"
 						results := []Tsundokus{site, book}
 						//ここでAPIを呼び出す
 						jsonData := (`
