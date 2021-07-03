@@ -261,13 +261,10 @@ func main() {
 									}
 								},
 								{
-									"type": "button",
-									"style": "link",
-									"height": "sm",
-									"action": {
-										"type": "button",
-										"label": "already read"
-									}
+									"type": "postback",
+									"label": "already read!",
+									"data":"read",
+									"height": "sm"
 								},
 								{
 									"type": "spacer",
