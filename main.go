@@ -410,7 +410,7 @@ func main() {
 				if event.Postback.Data == "time" {
 					limited_results := []Tsundoku{}
 					free_time := event.Postback.Params.Time[:2] + event.Postback.Params.Time[3:]
-					resp, err := http.Get("http://localhost:50407/api/users/1/time/" + free_time)
+					resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/time/" + free_time)
 					if err != nil {
 						fmt.Println(err)
 						return
