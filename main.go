@@ -79,7 +79,6 @@ func main() {
 								linebot.NewMessageAction("サイト", "サイト"),
 							),
 						)
-
 						_, err = bot.ReplyMessage(event.ReplyToken, resp).Do()
 						if err != nil {
 							log.Print(err)
@@ -107,7 +106,8 @@ func main() {
 						for i, a := range results {
 							column1 := ""
 							column2 := ""
-							if a.Category == "book" { // if book
+							image_url := "https://pakutaso.cdn.rabify.me/shared/img/thumb/macbookFTHG1289.jpg?d=350" // pc用
+							if a.Category == "book" {                                                                // if book
 								column1 = "author"
 								column2 = "deadline"
 								if a.Author == "" {
@@ -115,6 +115,7 @@ func main() {
 								} else {
 									a.URL = a.Author //ここちょっと汚い
 								}
+								image_url = "https://imgs.u-note.me/note/caption/47488447.jpg"
 								a.RequiredTime = a.Deadline.String()
 							} else { // if site
 								column1 = "URL"
@@ -125,7 +126,7 @@ func main() {
 								"type": "bubble",
 								"hero": {
 									"type": "image",
-									"url": "https://imgs.u-note.me/note/caption/47488447.jpg",
+									"url": "` + image_url + `",
 									"size": "full",
 									"aspectRatio": "20:13",
 									"aspectMode": "cover"
