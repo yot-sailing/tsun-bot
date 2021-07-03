@@ -408,8 +408,10 @@ func main() {
 				fmt.Println(event.Postback)
 				if event.Postback.Data == "time" {
 					limited_results := []Tsundoku{}
-					free_time := event.Postback.Params.Time[:2] + event.Postback.Params.Time[3:]
-					resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/time/" + free_time)
+					hour, _ := strconv.Atoi(event.Postback.Params.Time[:2])
+					min, _ := strconv.Atoi(event.Postback.Params.Time[3:])
+					total_min := hour*60 + min
+					resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/time/" + strconv.Itoa(total_min))
 					if err != nil {
 						fmt.Println(err)
 						return
@@ -422,7 +424,7 @@ func main() {
 						}
 					}
 					if len(limited_results) == 0 {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(event.Postback.Params.Time[:2]+"時間"+event.Postback.Params.Time[3:]+"分以内で読めるサイトは無いわ、、")).Do(); err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(strconv.Itoa(total_min)+"分以内で読めるサイトは無いわ、、")).Do(); err != nil {
 							log.Print(err)
 						}
 						return
@@ -441,7 +443,7 @@ func main() {
 								"hero": {
 									"type": "image",
 									"url": "` + image_url + `",
-									"size": "full",
+									"size": "lg",
 									"aspectRatio": "20:13",
 									"aspectMode": "cover"
 								},
@@ -449,6 +451,10 @@ func main() {
 									"type": "box",
 									"layout": "vertical",
 									"contents": [
+									{
+										"type": "text",
+										"text": "` + strconv.Itoa(total_min) + `分以内で読める"
+									},
 									{
 										"type": "text",
 										"text": "` + a.Title + `",
