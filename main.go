@@ -282,8 +282,12 @@ func main() {
 						args := url.Values{}
 						args.Add("category", "site")
 						args.Add("url", tsumu_url)
-						res, _ := http.Get(tsumu_url)
-						fmt.Println(res.Body)
+						res, err_site := http.Get(tsumu_url)
+						if err_site != nil {
+							fmt.Println(err_site)
+						} else {
+							fmt.Println(res.Header)
+						}
 						_, err := http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
 						if err != nil {
 							fmt.Println("Request error:", err)
