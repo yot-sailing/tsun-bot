@@ -97,17 +97,19 @@ func main() {
 						book.Title = "リーダブルコード"
 						book.Category = "book"
 						book.Author = "Trevor Foucher"
-						results := []Tsundokus{site, book}
+						var result Tsundokus
 						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus"); err != nil {
 							fmt.Println("error:http get\n", err)
 						} else {
 							defer resp.Body.Close() //関数終了時の後始末
-							var result Tsundokus
 							if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 								fmt.Println("error:json\n", err)
 							}
 							fmt.Println(result.Category)
 						}
+						yes := []Tsundokus{site, book}
+						fmt.Println(yes)
+						results := []Tsundokus{result}
 						//ここでAPIを呼び出す url = "https://tsuntsun-api.heroku.app.com/users/1/tsundokus"
 						jsonData := (`
 									{
@@ -117,11 +119,11 @@ func main() {
 						for i, a := range results {
 							column1 := ""
 							column2 := ""
-							if a.Category == 0 { // if book
+							if a.Category == "book" { // if book
 								column1 = "author"
 								column2 = "deadline"
 								a.URL = a.Author //ここちょっと汚い
-								a.RequiredTime = a.DeadLine
+								a.RequiredTime = a.Deadline.String()
 							} else { // if site
 								column1 = "URL"
 								column2 = "total time"
@@ -183,7 +185,7 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  "text" : "` + a.CreatedAt + `", 
+											  "text" : "` + a.CreatedAt.String() + `", 
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
@@ -258,7 +260,7 @@ func main() {
 						}
 						// fmt.Println(jsonData)
 						jsonData += "]}"
-						fmt.Println(jsonData)
+						// fmt.Println(jsonData)
 						container, err_f := linebot.UnmarshalFlexMessageJSON([]byte(jsonData))
 						if err_f != nil {
 							fmt.Println("could not read json data because of ", err_f)
