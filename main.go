@@ -59,7 +59,7 @@ func main() {
 						resp := linebot.NewTemplateMessage(
 							"this is a buttons template",
 							linebot.NewButtonsTemplate(
-								"./tsn.jpg",
+								"https://ddnavi.com/wp-content/uploads/2020/04/tsundoku.jpg",
 								"積ん読消化！！",
 								"何時間何分暇か選んでね",
 								linebot.NewDatetimePickerAction("Time", "datetimepicker", "time", "", "23:59", "00:00"),
@@ -230,18 +230,15 @@ func main() {
 									}
 									},
 									{
-										"type": "button",
-										"style": "link",
-										"height": "sm",
-										"action": {
-											"type": "button",
-											"label": "already read"
-										}
-										},
-										{
-											"type": "spacer",
-											"size": "sm"
-										}
+										"type": "postback",
+										"label": "already read!",
+										"data":"read",
+										"height": "sm"
+									},
+									{
+										"type": "spacer",
+										"size": "sm"
+									}
 									],
 									"flex": 0
 									}
@@ -371,6 +368,7 @@ func main() {
 				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(event.Postback.Params.Time[:2]+"時間"+event.Postback.Params.Time[3:]+"分暇なのね")).Do(); err != nil {
 					log.Print(err)
 				}
+
 			}
 		}
 	})
