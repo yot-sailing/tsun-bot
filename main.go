@@ -220,25 +220,29 @@ func main() {
 								  "type": "box",
 								  "layout": "vertical",
 								  "spacing": "sm",
-								  "contents": [
+								  "contents": [`)
+							if a.Category == "site" {
+								jsonData += (`
+									{
+									"type": "button",
+									"style": "link",
+									"height": "sm",
+									"action": {
+									  "type": "uri",
+									  "label": "read now",
+									  "uri": "` + a.URL + `"
+									}
+								  },
+								`)
+							}
+							jsonData += (`
 									{
 									  "type": "button",
 									  "style": "link",
 									  "height": "sm",
 									  "action": {
-										"type": "uri",
-										"label": "read now",
-										"uri": "https://linecorp.com"
-									  }
-									},
-									{
-									  "type": "button",
-									  "style": "link",
-									  "height": "sm",
-									  "action": {
-										"type": "uri",
+										"type": "button",
 										"label": "already read",
-										"uri": "https://linecorp.com"
 									  }
 									},
 									{
