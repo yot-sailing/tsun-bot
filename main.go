@@ -98,21 +98,21 @@ func main() {
 						book.Title = "リーダブルコード"
 						book.Category = "book"
 						book.Author = "Trevor Foucher"
-						var result Tsundoku
+						var results []Tsundoku
 						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus"); err != nil {
 							fmt.Println("error:http get\n", err)
 						} else {
 							defer resp.Body.Close()
 							byteArray, _ := ioutil.ReadAll(resp.Body)
-							fmt.Println(string(byteArray))
-							if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-								fmt.Println("error:json\n", err)
+							res_str := string(byteArray)
+							err := json.Unmarshal([]byte(res_str), &results)
+							if err != nil {
+								fmt.Println(err)
+								return
 							}
-							fmt.Println(result.Category)
 						}
 						yes := []Tsundoku{site, book}
 						fmt.Println(yes)
-						results := []Tsundoku{result}
 						fmt.Println(results)
 						//ここでAPIを呼び出す url = "https://tsuntsun-api.heroku.app.com/users/1/Tsundoku"
 						jsonData := (`
