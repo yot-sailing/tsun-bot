@@ -83,7 +83,13 @@ func main() {
 						}
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
-						results := []Tsundokus{}
+						var site Tsundokus
+						site.Title = "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話"
+						site.Category = 1
+						site.createdAt = "2021/07/02"
+						site.RequiredTime = "5min"
+						site.URL = "http://localhost:8080"
+						results := []Tsundokus{site, site}
 						//ここでAPIを呼び出す
 						jsonData := (`
 					{
