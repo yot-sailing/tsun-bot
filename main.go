@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -101,8 +102,9 @@ func main() {
 						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus"); err != nil {
 							fmt.Println("error:http get\n", err)
 						} else {
-							defer resp.Body.Close() //関数終了時の後始末
-							fmt.Println(resp.Body)
+							defer resp.Body.Close()
+							byteArray, _ := ioutil.ReadAll(resp.Body)
+							fmt.Println(string(byteArray))
 							if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 								fmt.Println("error:json\n", err)
 							}
