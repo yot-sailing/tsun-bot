@@ -296,7 +296,7 @@ func main() {
 						args.Add("url", tsumu_url)
 						args.Add("title", title)
 						args.Add("required_time", content)
-						_, err := http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
+						_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
 						if err != nil {
 							fmt.Println("Request error:", err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかったわ、ごめん")).Do(); err != nil {
