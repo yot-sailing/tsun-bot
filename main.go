@@ -339,6 +339,23 @@ func main() {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
 							log.Print(err)
 						}
+					} else if strings.Contains(message.Text, "already read : tsundokuID ") {
+						tsum_del, _ := strconv.Atoi(message.Text[27:])
+						fmt.Println(tsum_del)
+						req, _ := http.NewRequest("DELETE", "https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus/"+strconv.Itoa(tsum_del), nil)
+						req.Header.Set("Accept", "application/json")
+
+						client := new(http.Client)
+						_, err := client.Do(req)
+						if err != nil {
+							fmt.Println("Request error:", err)
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("消せなかった、すまぬ")).Do(); err != nil {
+								log.Print(err)
+							}
+						}
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("えらい！よく読めました！")).Do(); err != nil {
+							log.Print(err)
+						}
 					} else {
 						if want_added {
 							title := message.Text
