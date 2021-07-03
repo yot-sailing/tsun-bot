@@ -11,6 +11,15 @@ import (
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
+type Tsundokus struct {
+	Title    string
+	Category int // 0 => book, 1 => site
+	URL      string
+	// Author string
+	RequiredTime string
+	createdAt    string
+}
+
 func main() {
 	want_added := false
 	err0 := godotenv.Load(fmt.Sprintf("%s.env", os.Getenv("GO_ENV")))
@@ -47,7 +56,7 @@ func main() {
 						resp := linebot.NewTemplateMessage(
 							"this is a buttons template",
 							linebot.NewButtonsTemplate(
-								"https://farm5.staticflickr.com/4849/45718165635_328355a940_m.jpg",
+								"./tsn.jpg",
 								"積ん読消化！！",
 								"何時間何分暇か選んでね",
 								linebot.NewDatetimePickerAction("Time", "datetimepicker", "time", "", "23:59", "00:00"),
@@ -74,264 +83,157 @@ func main() {
 						}
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
+						results := []Tsundokus{}
 						//ここでAPIを呼び出す
-						jsonData := []byte(`
+						jsonData := (`
 					{
 					"type": "carousel",
 					"contents": [
-						{
-						"type": "bubble",
-						"body": {
-							"type": "box",
-							"layout": "vertical",
-							"contents": [
-							{
-								"type": "text",
-								"text": "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話",
-								"weight": "bold",
-								"size": "xl",
-								"wrap": true
-							},
-							{
-								"type": "box",
-								"layout": "vertical",
-								"margin": "lg",
-								"spacing": "sm",
-								"contents": [
-								{
-									"type": "box",
-									"layout": "baseline",
-									"spacing": "sm",
-									"contents": [
-									{
-										"type": "text",
-										"text": "URL",
-										"color": "#aaaaaa",
-										"size": "sm",
-										"flex": 2
-									},
-									{
-									  "type": "text",
-									  "text": "http://localhost:8080",
-									  "wrap": true,
-									  "color": "#666666",
-									  "size": "sm",
-									  "flex": 5
-									}
-								  ]
-								},
-								{
-								  "type": "box",
-								  "layout": "baseline",
-								  "spacing": "sm",
-								  "contents": [
-									{
-									  "type": "text",
-									  "text": "created",
-									  "color": "#aaaaaa",
-									  "size": "sm",
-									  "flex": 2,
-									  "wrap": true
-									},
-									{
-									  "type": "text",
-									  "text": "2021/07/02",
-									  "wrap": true,
-									  "color": "#666666",
-									  "size": "sm",
-									  "flex": 5
-									}
-								  ]
-								},
-								{
-								  "type": "box",
-								  "layout": "baseline",
-								  "spacing": "sm",
-								  "contents": [
-									{
-									  "type": "text",
-									  "text": "total time",
-									  "color": "#aaaaaa",
-									  "size": "sm",
-									  "flex": 2,
-									  "wrap": true
-									},
-									{
-									  "type": "text",
-									  "text": "5min",
-									  "wrap": true,
-									  "color": "#666666",
-									  "size": "sm",
-									  "flex": 5
-									}
-								  ]
-								}
-							  ]
-							}
-						  ]
-						},
-						"footer": {
-						  "type": "box",
-						  "layout": "vertical",
-						  "spacing": "sm",
-						  "contents": [
-							{
-							  "type": "button",
-							  "style": "link",
-							  "height": "sm",
-							  "action": {
-								"type": "uri",
-								"label": "read now",
-								"uri": "https://linecorp.com"
-							  }
-							},
-							{
-							  "type": "button",
-							  "style": "link",
-							  "height": "sm",
-							  "action": {
-								"type": "uri",
-								"label": "already read",
-								"uri": "https://linecorp.com"
-							  }
-							},
-							{
-							  "type": "spacer",
-							  "size": "sm"
-							}
-						  ],
-						  "flex": 0
-						}
-					  },
-					  {
-						"type": "bubble",
-						
-						"body": {
-						  "type": "box",
-						  "layout": "vertical",
-						  "contents": [
-							{
-								"type": "text",
-								"text": "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話",
-								"weight": "bold",
-								"size": "xl",
-								"wrap": true
-							},
-							{
-								"type": "box",
-								"layout": "vertical",
-								"margin": "lg",
-								"spacing": "sm",
-								"contents": [
-								{
-									"type": "box",
-									"layout": "baseline",
-									"spacing": "sm",
-									"contents": [
-									{
-										"type": "text",
-										"text": "URL",
-										"color": "#aaaaaa",
-										"size": "sm",
-										"flex": 2
-									},
-									{
-										"type": "text",
-										"text": "http://localhost:8080",
-										"wrap": true,
-										"color": "#666666",
-										"size": "sm",
-										"flex": 5
-									}
-								]
-								},
-								{
-									"type": "box",
-									"layout": "baseline",
-									"spacing": "sm",
-									"contents": [
-									{
-										"type": "text",
-										"text": "created",
-										"color": "#aaaaaa",
-										"size": "sm",
-										"flex": 2,
-										"wrap": true
-									},
-									{
-										"type": "text",
-										"text": "2021/07/02",
-										"wrap": true,
-										"color": "#666666",
-										"size": "sm",
-										"flex": 5
-									}
-								]
-								},
-								{
-									"type": "box",
-									"layout": "baseline",
-									"spacing": "sm",
-									"contents": [
-									{
-										"type": "text",
-										"text": "total time",
-										"color": "#aaaaaa",
-										"size": "sm",
-										"flex": 2,
-										"wrap": true
-									},
-									{
-										"type": "text",
-										"text": "5min",
-										"wrap": true,
-										"color": "#666666",
-										"size": "sm",
-										"flex": 5
-									}
-								]
-								}
-							]
-							}
-						]
-						},
-						"footer": {
-							"type": "box",
-							"layout": "vertical",
-							"spacing": "sm",
-							"contents": [
-							{
-								"type": "button",
-								"style": "link",
-								"height": "sm",
-								"action": {
-								"type": "uri",
-								"label": "read now",
-								"uri": "https://linecorp.com"
-							}
-							},
-							{
-								"type": "button",
-								"style": "link",
-								"height": "sm",
-								"action": {
-								"type": "uri",
-								"label": "already read",
-								"uri": "https://linecorp.com"
-							}
-							},
-							{
-								"type": "spacer",
-								"size": "sm"
-							}
-						],
-						"flex": 0
-						}
-					}
-					]
-					}
 					`)
-						container, err_f := linebot.UnmarshalFlexMessageJSON(jsonData)
+						for _, a := range results {
+							jsonData += (`
+								{
+								"type": "bubble",
+								"body": {
+									"type": "box",
+									"layout": "vertical",
+									"contents": [
+									{
+										"type": "text",
+										"text": 
+									`) + a.Title
+							// "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話"
+							jsonData += (`
+										,
+										"weight": "bold",
+										"size": "xl",
+										"wrap": true
+									},
+									{
+										"type": "box",
+										"layout": "vertical",
+										"margin": "lg",
+										"spacing": "sm",
+										"contents": [
+										{
+											"type": "box",
+											"layout": "baseline",
+											"spacing": "sm",
+											"contents": [
+											{
+												"type": "text",
+												"text": "URL",
+												"color": "#aaaaaa",
+												"size": "sm",
+												"flex": 2
+											},
+											{
+											  "type": "text",
+											  "text":`) + a.URL
+							//   "http://localhost:8080"
+							jsonData += (`
+											  ,
+											  "wrap": true,
+											  "color": "#666666",
+											  "size": "sm",
+											  "flex": 5
+											}
+										  ]
+										},
+										{
+										  "type": "box",
+										  "layout": "baseline",
+										  "spacing": "sm",
+										  "contents": [
+											{
+											  "type": "text",
+											  "text": "created",
+											  "color": "#aaaaaa",
+											  "size": "sm",
+											  "flex": 2,
+											  "wrap": true
+											},
+											{
+											  "type": "text",
+											  `) + a.createdAt
+							//   "text": "2021/07/02"
+							jsonData += (`
+											  ,
+											  "wrap": true,
+											  "color": "#666666",
+											  "size": "sm",
+											  "flex": 5
+											}
+										  ]
+										},
+										{
+										  "type": "box",
+										  "layout": "baseline",
+										  "spacing": "sm",
+										  "contents": [
+											{
+											  "type": "text",
+											  "text": "total time",
+											  "color": "#aaaaaa",
+											  "size": "sm",
+											  "flex": 2,
+											  "wrap": true
+											},
+											{
+											  "type": "text",
+											  "text": 
+											  `) + a.RequiredTime
+							//   "5min"
+							jsonData += (`
+											  ,
+											  "wrap": true,
+											  "color": "#666666",
+											  "size": "sm",
+											  "flex": 5
+											}
+										  ]
+										}
+									  ]
+									}
+								  ]
+								},
+								"footer": {
+								  "type": "box",
+								  "layout": "vertical",
+								  "spacing": "sm",
+								  "contents": [
+									{
+									  "type": "button",
+									  "style": "link",
+									  "height": "sm",
+									  "action": {
+										"type": "uri",
+										"label": "read now",
+										"uri": "https://linecorp.com"
+									  }
+									},
+									{
+									  "type": "button",
+									  "style": "link",
+									  "height": "sm",
+									  "action": {
+										"type": "uri",
+										"label": "already read",
+										"uri": "https://linecorp.com"
+									  }
+									},
+									{
+									  "type": "spacer",
+									  "size": "sm"
+									}
+								  ],
+								  "flex": 0
+								}
+							  },
+							`)
+						}
+
+						container, err_f := linebot.UnmarshalFlexMessageJSON([]byte(jsonData))
 						if err_f != nil {
 							fmt.Println("could not read json data because of ", err_f)
 						}
