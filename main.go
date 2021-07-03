@@ -98,7 +98,7 @@ func main() {
 						book.Category = "book"
 						book.Author = "Trevor Foucher"
 						var result Tsundoku
-						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/Tsundoku"); err != nil {
+						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus"); err != nil {
 							fmt.Println("error:http get\n", err)
 						} else {
 							defer resp.Body.Close() //関数終了時の後始末
