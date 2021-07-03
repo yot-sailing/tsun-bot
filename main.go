@@ -409,8 +409,11 @@ func main() {
 				fmt.Println(event.Postback)
 				if event.Postback.Data == "time" {
 					//ここで何分で読めるサイトかを提案するAPIを呼び出す
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(event.Postback.Params.Time[:2]+"時間"+event.Postback.Params.Time[3:]+"分暇なのね")).Do(); err != nil {
-						log.Print(err)
+					resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/time/" + event.Postback.Params.Time)
+					if err != nil {
+						fmt.Println(err)
+					} else {
+						fmt.Println(resp)
 					}
 				} else if event.Postback.Data == "date" && title_added {
 					args := url.Values{}
