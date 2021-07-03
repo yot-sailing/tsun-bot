@@ -235,7 +235,7 @@ func main() {
 										"height": "sm",
 										"action": {
 											"type": "button",
-											"label": "already read",
+											"label": "already read"
 										}
 										},
 										{
