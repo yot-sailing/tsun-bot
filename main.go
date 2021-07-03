@@ -417,10 +417,18 @@ func main() {
 					if tsun_book.Author != "" {
 						args.Add("author", tsun_book.Author)
 					}
+					t, _ := time.Parse("0001-01-01 00:00:00 +0000 UTC", event.Postback.Params.Date)
+					fmt.Println(t)
 					args.Add("deadline", event.Postback.Params.Date)
 					_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
-						log.Print(err)
+					if err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった！すまぬ")).Do(); err != nil {
+							log.Print(err)
+						}
+					} else {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
+							log.Print(err)
+						}
 					}
 					title_added = false
 					tsun_book = Book{}
