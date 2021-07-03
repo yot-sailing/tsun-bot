@@ -123,6 +123,13 @@ func main() {
 							jsonData += (`
 								{
 								"type": "bubble",
+								"hero": {
+									"type": "image",
+									"url": "https://imgs.u-note.me/note/caption/47488447.jpg",
+									"size": "full",
+									"aspectRatio": "20:13",
+									"aspectMode": "cover",
+								},
 								"body": {
 									"type": "box",
 									"layout": "vertical",
