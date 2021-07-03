@@ -1,24 +1,28 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/line/line-bot-sdk-go/linebot"
 )
 
 type Tsundokus struct {
-	Title        string
-	Category     int // 0 => book, 1 => site
-	URL          string
-	Author       string
-	RequiredTime string
-	CreatedAt    string
-	DeadLine     string
+	ID           int       `gorm:"primary_key" json:"id"`
+	UserID       int       `json:"userID"`
+	Category     string    `gorm:"not null" json:"category"`
+	Title        string    `gorm:"not null" json:"title"`
+	Author       string    `json:"author"`
+	URL          string    `json:"url"`
+	Deadline     time.Time `json:"deadline"`
+	RequiredTime string    `json:"requiredTime"`
+	CreatedAt    time.Time `json:"createdAt"`
 }
 
 func main() {
@@ -87,18 +91,23 @@ func main() {
 						var site Tsundokus
 						var book Tsundokus
 						site.Title = "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話"
-						site.Category = 1
-						site.CreatedAt = "2021/07/02"
+						site.Category = "site"
 						site.RequiredTime = "5min"
 						site.URL = "http://localhost:8080"
 						book.Title = "リーダブルコード"
-						book.CreatedAt = "2021/03/03"
-						book.Category = 0
+						book.Category = "book"
 						book.Author = "Trevor Foucher"
-						book.DeadLine = "2021/09/09"
 						results := []Tsundokus{site, book}
-						result, _ := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus")
-						fmt.Println(result.Body)
+						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus"); err != nil {
+							fmt.Println("error:http get\n", err)
+						} else {
+							defer resp.Body.Close() //関数終了時の後始末
+							var result Tsundokus
+							if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+								fmt.Println("error:json\n", err)
+							}
+							fmt.Println(result.Category)
+						}
 						//ここでAPIを呼び出す url = "https://tsuntsun-api.heroku.app.com/users/1/tsundokus"
 						jsonData := (`
 									{
