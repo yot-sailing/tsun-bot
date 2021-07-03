@@ -64,7 +64,7 @@ func main() {
 								"https://ddnavi.com/wp-content/uploads/2020/04/tsundoku.jpg",
 								"積ん読消化！！",
 								"何時間何分暇か選んでね",
-								linebot.NewDatetimePickerAction("Time", "datetimepicker", "time", "", "23:59", "00:00"),
+								linebot.NewDatetimePickerAction("Time", "time", "time", "", "23:59", "00:00"),
 							),
 						)
 
@@ -380,7 +380,7 @@ func main() {
 									"https://ddnavi.com/wp-content/uploads/2020/04/tsundoku.jpg",
 									"本をいつまでに読むか決めます",
 									"何月何日に読み終えたいか教えてね",
-									linebot.NewDatetimePickerAction("Date", "datetimepicker", "date", "", "2025-07-02", "2021-07-02"),
+									linebot.NewDatetimePickerAction("Date", "date", "date", "", "2025-07-02", "2021-07-02"),
 								),
 							)
 
@@ -409,7 +409,7 @@ func main() {
 				}
 			} else if event.Type == linebot.EventTypePostback {
 				fmt.Println(event.Postback.Params)
-				fmt.Println(event.Postback.Data)
+				fmt.Println(event.Postback)
 				if event.Postback.Data == "time" {
 					//ここで何分で読めるサイトかを提案するAPIを呼び出す
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(event.Postback.Params.Time[:2]+"時間"+event.Postback.Params.Time[3:]+"分暇なのね")).Do(); err != nil {
