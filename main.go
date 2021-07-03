@@ -237,6 +237,7 @@ func main() {
 						}
 						// fmt.Println(jsonData)
 						jsonData += "]}"
+						fmt.Println(jsonData)
 						container, err_f := linebot.UnmarshalFlexMessageJSON([]byte(jsonData))
 						if err_f != nil {
 							fmt.Println("could not read json data because of ", err_f)
