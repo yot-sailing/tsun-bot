@@ -436,14 +436,14 @@ func main() {
 					for i, a := range limited_results {
 						column1 := "URL"
 						column2 := "total time"
-						image_url := "https://pakutaso.cdn.rabify.me/shared/img/thumb/macbookFTHG1289.jpg?d=350" // pc用
+						image_url := "https://pakutaso.cdn.rabify.me/shared/img/thumb/macbookFTHG1289.jpg?d=200" // pc用
 						jsonData += (`
 								{
 								"type": "bubble",
 								"hero": {
 									"type": "image",
 									"url": "` + image_url + `",
-									"size": "lg",
+									"size": "full",
 									"aspectRatio": "20:13",
 									"aspectMode": "cover"
 								},
