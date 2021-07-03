@@ -30,7 +30,8 @@ type Tsundoku struct {
 }
 
 func main() {
-	want_added := false
+	want_added := false  //本を加えたそう
+	title_added := false //タイトルを加えてもらっています
 	bot, err := linebot.New(
 		os.Getenv("SECRET"),
 		os.Getenv("CHANNEL_ACCESS_TOKEN"),
@@ -52,6 +53,7 @@ func main() {
 		}
 		for _, event := range events {
 			if event.Type == linebot.EventTypeMessage {
+				fmt.Println(event.Source.UserID)
 				switch message := event.Message.(type) {
 				case *linebot.TextMessage:
 					if message.Text == "今暇" {
@@ -302,7 +304,7 @@ func main() {
 						}
 						want_added = true
 					} else if message.Text == "本" {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("タイトルを教えて")).Do(); err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("タイトルを教えて、著者もわかるなら改行して入力して")).Do(); err != nil {
 							log.Print(err)
 						}
 						want_added = true
@@ -354,14 +356,40 @@ func main() {
 							log.Print(err)
 						}
 					} else {
-						if want_added {
-							title := message.Text
-							fmt.Println(title)
-							want_added = false
-							//ここで 積ん読追加のAPIを呼ぶ
+						if want_added { //本の追加
 							args := url.Values{}
 							args.Add("category", "book")
-							args.Add("title", title)
+
+							title_author := message.Text
+							if strings.Contains(title_author, "\n") {
+								re := strings.Split(title_author, "\n")
+								title := re[0]
+								author := re[1]
+								args.Add("author", author)
+								args.Add("title", title)
+
+							} else {
+								title := title_author
+								args.Add("title", title)
+							}
+							want_added = false
+							title_added = true
+							resp := linebot.NewTemplateMessage(
+								"this is a buttons template",
+								linebot.NewButtonsTemplate(
+									"https://ddnavi.com/wp-content/uploads/2020/04/tsundoku.jpg",
+									"本をいつまでに読むか決めます",
+									"何月何日に読み終えたいか教えてね",
+									linebot.NewDatetimePickerAction("Date", "datetimepicker", "date", "", "2025/07/02", "2021/07/02"),
+								),
+							)
+
+							_, err = bot.ReplyMessage(event.ReplyToken, resp).Do()
+							if err != nil {
+								log.Print(err)
+							}
+
+							//ここで 積ん読追加のAPIを呼ぶ
 							_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
 								log.Print(err)
@@ -381,9 +409,16 @@ func main() {
 				}
 			} else if event.Type == linebot.EventTypePostback {
 				fmt.Println(event.Postback.Params)
-				//ここで何分で読めるサイトかを提案するAPIを呼び出す
-				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(event.Postback.Params.Time[:2]+"時間"+event.Postback.Params.Time[3:]+"分暇なのね")).Do(); err != nil {
-					log.Print(err)
+				if event.Postback.Data == "time" {
+					//ここで何分で読めるサイトかを提案するAPIを呼び出す
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(event.Postback.Params.Time[:2]+"時間"+event.Postback.Params.Time[3:]+"分暇なのね")).Do(); err != nil {
+						log.Print(err)
+					}
+				} else if event.Postback.Data == "date" && title_added {
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(event.Postback.Params.Date+"までに読み終えようね")).Do(); err != nil {
+						log.Print(err)
+					}
+					title_added = false
 				}
 
 			}
