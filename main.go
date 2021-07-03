@@ -340,7 +340,7 @@ func main() {
 							log.Print(err)
 						}
 					} else if strings.Contains(message.Text, "already read : tsundokuID ") {
-						tsum_del, _ := strconv.Atoi(message.Text[27:])
+						tsum_del, _ := strconv.Atoi(message.Text[26:])
 						fmt.Println(tsum_del)
 						req, _ := http.NewRequest("DELETE", "https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus/"+strconv.Itoa(tsum_del), nil)
 						req.Header.Set("Accept", "application/json")
