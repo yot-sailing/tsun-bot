@@ -333,8 +333,7 @@ func main() {
 						args.Add("category", "site")
 						args.Add("url", tsumu_url)
 						args.Add("title", title)
-						args.Add("requiredTime", strconv.Itoa(len(content)/500)+"min")
-						fmt.Println(strconv.Itoa(len(content)/500) + "min")
+						args.Add("requiredTime", strconv.Itoa(len(content)/500))
 						_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
 						if err != nil {
 							fmt.Println("Request error:", err)
@@ -417,8 +416,6 @@ func main() {
 					if tsun_book.Author != "" {
 						args.Add("author", tsun_book.Author)
 					}
-					t, _ := time.Parse("0001-01-01 00:00:00 +0000 UTC", event.Postback.Params.Date)
-					fmt.Println(t)
 					args.Add("deadline", event.Postback.Params.Date)
 					_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
 					if err != nil {
