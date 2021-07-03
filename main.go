@@ -28,6 +28,12 @@ type Tsundoku struct {
 	RequiredTime string
 	CreatedAt    time.Time
 }
+type Book struct {
+	Title  string
+	Author string
+}
+
+var tsun_book Book
 
 func main() {
 	want_added := false  //本を加えたそう
@@ -357,20 +363,16 @@ func main() {
 						}
 					} else {
 						if want_added { //本の追加
-							args := url.Values{}
-							args.Add("category", "book")
-
 							title_author := message.Text
 							if strings.Contains(title_author, "\n") {
 								re := strings.Split(title_author, "\n")
 								title := re[0]
 								author := re[1]
-								args.Add("author", author)
-								args.Add("title", title)
-
+								tsun_book.Author = author
+								tsun_book.Title = title
 							} else {
 								title := title_author
-								args.Add("title", title)
+								tsun_book.Title = title
 							}
 							want_added = false
 							title_added = true
@@ -383,15 +385,8 @@ func main() {
 									linebot.NewDatetimePickerAction("Date", "date", "date", "", "2025-07-02", "2021-07-02"),
 								),
 							)
-
 							_, err = bot.ReplyMessage(event.ReplyToken, resp).Do()
 							if err != nil {
-								log.Print(err)
-							}
-
-							//ここで 積ん読追加のAPIを呼ぶ
-							_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
-							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
 								log.Print(err)
 							}
 						} else {
@@ -416,10 +411,18 @@ func main() {
 						log.Print(err)
 					}
 				} else if event.Postback.Data == "date" && title_added {
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(event.Postback.Params.Date+"までに読み終えようね")).Do(); err != nil {
+					args := url.Values{}
+					args.Add("category", "book")
+					args.Add("title", tsun_book.Title)
+					if tsun_book.Author != "" {
+						args.Add("author", tsun_book.Author)
+					}
+					_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
 						log.Print(err)
 					}
 					title_added = false
+					tsun_book = Book{}
 				}
 
 			}
