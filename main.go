@@ -106,11 +106,9 @@ func main() {
 									"contents": [
 									{
 										"type": "text",
-										"text": 
-									`) + `"` + a.Title + `"`
+										"text": "` + a.Title + `",`)
 							// "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話"
 							jsonData += (`
-										,
 										"weight": "bold",
 										"size": "xl",
 										"wrap": true
@@ -135,10 +133,9 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  "text":`) + `"` + a.URL + `"`
+											  "text": "` + a.URL + `",`)
 							//   "http://localhost:8080"
 							jsonData += (`
-											  ,
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
@@ -161,10 +158,9 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  `) + `"` + a.createdAt + `"`
+											  "text" : "` + a.createdAt + `", `)
 							//   "text": "2021/07/02"
 							jsonData += (`
-											  ,
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
@@ -187,11 +183,9 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  "text": 
-											  `) + `"` + a.RequiredTime + `"`
+											  "text": "` + a.RequiredTime + `" ,`)
 							//   "5min"
 							jsonData += (`
-											  ,
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
