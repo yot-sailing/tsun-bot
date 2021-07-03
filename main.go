@@ -107,7 +107,7 @@ func main() {
 									{
 										"type": "text",
 										"text": 
-									`) + a.Title
+									`) + `"` + a.Title + `"`
 							// "tsuntsunでサイトを積み始めたら爆速で消化できるようになった話"
 							jsonData += (`
 										,
@@ -135,7 +135,7 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  "text":`) + a.URL
+											  "text":`) + `"` + a.URL + `"`
 							//   "http://localhost:8080"
 							jsonData += (`
 											  ,
@@ -161,7 +161,7 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  `) + a.createdAt
+											  `) + `"` + a.createdAt + `"`
 							//   "text": "2021/07/02"
 							jsonData += (`
 											  ,
@@ -188,7 +188,7 @@ func main() {
 											{
 											  "type": "text",
 											  "text": 
-											  `) + a.RequiredTime
+											  `) + `"` + a.RequiredTime + `"`
 							//   "5min"
 							jsonData += (`
 											  ,
