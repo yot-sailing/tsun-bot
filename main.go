@@ -97,7 +97,9 @@ func main() {
 						book.Author = "Trevor Foucher"
 						book.DeadLine = "2021/09/09"
 						results := []Tsundokus{site, book}
-						//ここでAPIを呼び出す
+						result, _ := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus")
+						fmt.Println(result.Body)
+						//ここでAPIを呼び出す url = "https://tsuntsun-api.heroku.app.com/users/1/tsundokus"
 						jsonData := (`
 									{
 									"type": "carousel",
