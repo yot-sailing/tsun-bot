@@ -13,7 +13,6 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/joho/godotenv"
 	"github.com/line/line-bot-sdk-go/linebot"
 	"github.com/yukihir0/gec"
 )
@@ -32,12 +31,6 @@ type Tsundoku struct {
 
 func main() {
 	want_added := false
-	err0 := godotenv.Load(fmt.Sprintf("%s.env", os.Getenv("GO_ENV")))
-	if err0 != nil {
-		fmt.Println("could not load env file")
-	}
-	// LINE Botクライアント生成する
-	// BOT にはチャネルシークレットとチャネルトークンを環境変数から読み込み引数に渡す
 	bot, err := linebot.New(
 		os.Getenv("SECRET"),
 		os.Getenv("CHANNEL_ACCESS_TOKEN"),
@@ -117,7 +110,11 @@ func main() {
 							if a.Category == "book" { // if book
 								column1 = "author"
 								column2 = "deadline"
-								a.URL = a.Author //ここちょっと汚い
+								if a.Author == "" {
+									a.URL = "まだ入力されてないヨ"
+								} else {
+									a.URL = a.Author //ここちょっと汚い
+								}
 								a.RequiredTime = a.Deadline.String()
 							} else { // if site
 								column1 = "URL"
@@ -214,14 +211,14 @@ func main() {
 									  ]
 									}
 								  ]
-								},
-								"footer": {
-								  "type": "box",
-								  "layout": "vertical",
-								  "spacing": "sm",
-								  "contents": [`)
+								},`)
 							if a.Category == "site" {
 								jsonData += (`
+								"footer": {
+									"type": "box",
+									"layout": "vertical",
+									"spacing": "sm",
+									"contents": [
 									{
 									"type": "button",
 									"style": "link",
@@ -231,10 +228,42 @@ func main() {
 										"label": "read now",
 										"uri": "` + a.URL + `"
 									}
-									},`)
-							}
-							jsonData += (`
+									},
 									{
+										"type": "button",
+										"style": "link",
+										"height": "sm",
+										"action": {
+											"type": "button",
+											"label": "already read",
+										}
+										},
+										{
+											"type": "spacer",
+											"size": "sm"
+										}
+									],
+									"flex": 0
+									}
+								}`)
+							} else {
+								jsonData += (`
+								"footer": {
+									"type": "box",
+									"layout": "vertical",
+									"spacing": "sm",
+									"contents": [
+								{
+									"type": "button",
+									"style": "link",
+									"height": "sm",
+									"action": {
+										"type": "uri",
+										"label": "read now",
+										"uri": "` + a.URL + `"
+									}
+								},
+								{
 									"type": "button",
 									"style": "link",
 									"height": "sm",
@@ -242,15 +271,16 @@ func main() {
 										"type": "button",
 										"label": "already read",
 									}
-									},
-									{
-										"type": "spacer",
-										"size": "sm"
-									}
-								],
-								"flex": 0
+								},
+								{
+									"type": "spacer",
+									"size": "sm"
 								}
+							],
+							"flex": 0
+							}
 							}`)
+							}
 							if i != len(results)-1 {
 								jsonData += ","
 							}
@@ -315,6 +345,10 @@ func main() {
 							fmt.Println(title)
 							want_added = false
 							//ここで 積ん読追加のAPIを呼ぶ
+							args := url.Values{}
+							args.Add("category", "book")
+							args.Add("title", title)
+							_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
 								log.Print(err)
 							}
