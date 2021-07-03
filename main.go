@@ -380,7 +380,7 @@ func main() {
 									"https://ddnavi.com/wp-content/uploads/2020/04/tsundoku.jpg",
 									"本をいつまでに読むか決めます",
 									"何月何日に読み終えたいか教えてね",
-									linebot.NewDatetimePickerAction("Date", "datetimepicker", "date", "", "2025/07/02", "2021/07/02"),
+									linebot.NewDatetimePickerAction("Date", "datetimepicker", "date", "", "2025-07-02", "2021-07-02"),
 								),
 							)
 
