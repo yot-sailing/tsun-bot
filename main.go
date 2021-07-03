@@ -288,6 +288,7 @@ func main() {
 						} else {
 							fmt.Println(res.Header)
 						}
+						args.Add("title", res.Header.Get("title"))
 						_, err := http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus", args)
 						if err != nil {
 							fmt.Println("Request error:", err)
