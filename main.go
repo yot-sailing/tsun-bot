@@ -118,8 +118,8 @@ func main() {
 							column2 := ""
 							image_url := "https://pakutaso.cdn.rabify.me/shared/img/thumb/macbookFTHG1289.jpg?d=350" // pc用
 							if a.Category == "book" {                                                                // if book
-								column1 = "author"
-								column2 = "deadline"
+								column1 = "著者"
+								column2 = "この日までに読む"
 								if a.Author == "" {
 									a.URL = "まだ入力されてないヨ"
 								} else {
@@ -129,7 +129,7 @@ func main() {
 								a.RequiredTime = a.Deadline.String()[:10]
 							} else { // if site
 								column1 = "URL"
-								column2 = "total time"
+								column2 = "読了に必要な時間"
 							}
 							jsonData += (`
 								{
@@ -187,7 +187,7 @@ func main() {
 										  "contents": [
 											{
 											  "type": "text",
-											  "text": "created",
+											  "text": "作成日時",
 											  "color": "#aaaaaa",
 											  "size": "sm",
 											  "flex": 2,
@@ -243,7 +243,7 @@ func main() {
 									"height": "sm",
 									"action": {
 										"type": "uri",
-										"label": "read now",
+										"label": "今から読む",
 										"uri": "` + a.URL + `"
 									}
 									},
@@ -253,7 +253,7 @@ func main() {
 										"height": "sm",
 										"action": {
 											"type": "message",
-											"label": "already read",
+											"label": "もう読んだよ",
 											"text": "already read : tsundokuID ` + strconv.Itoa(a.ID) + `"
 										}
 										},
