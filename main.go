@@ -360,8 +360,9 @@ func main() {
 						}
 						opt := gec.NewOption()
 						content, title := gec.Analyse(html, opt)
+						var tsundoku_id int
 
-						err = DB.QueryRow("INSERT INTO tsundokus (category, url, title, requiredTime) values ($1 , $2, $3, $4);", "site", tsumu_url, title, strconv.Itoa(len(content)/500))
+						err = DB.QueryRow("INSERT INTO tsundokus (category, url, title, requiredTime) values ($1 , $2, $3, $4) RETURNING id;", "site", tsumu_url, title, strconv.Itoa(len(content)/500)).Scan(&tsundoku_id)
 						if err != nil {
 							log.Println(err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
@@ -623,7 +624,8 @@ func main() {
 						fmt.Println(err4)
 					}
 				} else if event.Postback.Data == "date" && title_added {
-					err = DB.QueryRow("INSERT INTO tsundokus (category, title, author, deadline) values ($1 , $2, $3, $4);", "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date)
+					var tsundoku_id int
+					err = DB.QueryRow("INSERT INTO tsundokus (category, title, author, deadline) values ($1 , $2, $3, $4);", "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date).Scan(&tsundoku_id)
 					if err != nil {
 						log.Println(err)
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
