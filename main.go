@@ -119,7 +119,7 @@ func main() {
 							nullURL := new(sql.NullString)
 							nullDeadLine := new(pq.NullTime)
 							nullRequiredTime := new(sql.NullString)
-							err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, &nullAuthor, &nullURL, &nullDeadline, &nullRequiredTime, &result.CreatedAt)
+							err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, &nullAuthor, &nullURL, &nullDeadLine, &nullRequiredTime, &result.CreatedAt)
 							if err != nil {
 								log.Println("115:", err)
 								return
