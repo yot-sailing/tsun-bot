@@ -123,7 +123,6 @@ func main() {
 							log.Println(rows)
 							err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, &nullAuthor, &nullURL, &nullDeadLine, &nullRequiredTime, &nullCreatedAt)
 							if err != nil {
-								log.Println("115:", err)
 								return
 							}
 							if nullAuthor.Valid {
@@ -151,7 +150,7 @@ func main() {
 						if len(results) > 12 {
 							results = results[:12]
 						}
-						fmt.Println(results)
+						fmt.Println(results[0].ID, results[0].URL, results[0].Category)
 						if len(results) == 0 {
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("今積んでる本やサイトはないよ！")).Do(); err != nil {
 								log.Print(err)
