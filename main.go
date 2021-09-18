@@ -110,7 +110,7 @@ func main() {
 						var results []Tsundoku
 						rows, err := DB.Query("select * from tsundokus where user_id = $1;", userID)
 						if err != nil {
-							log.Println("108:", err)
+							return
 						}
 						defer rows.Close()
 						for rows.Next() {
@@ -132,7 +132,6 @@ func main() {
 						}
 						fmt.Println(results)
 						if len(results) == 0 {
-							fmt.Println("okok")
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("今積んでる本やサイトはないよ！")).Do(); err != nil {
 								log.Print(err)
 							}
@@ -362,7 +361,7 @@ func main() {
 						content, title := gec.Analyse(html, opt)
 						var tsundoku_id int
 
-						err = DB.QueryRow("INSERT INTO tsundokus (category, url, title, requiredTime) values ($1 , $2, $3, $4) RETURNING id;", "site", tsumu_url, title, strconv.Itoa(len(content)/500)).Scan(&tsundoku_id)
+						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, requiredTime) values ($1 , $2, $3, $4, $5) RETURNING id;", "site", userID, tsumu_url, title, strconv.Itoa(len(content)/500)).Scan(&tsundoku_id)
 						if err != nil {
 							log.Println(err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
@@ -625,7 +624,7 @@ func main() {
 					}
 				} else if event.Postback.Data == "date" && title_added {
 					var tsundoku_id int
-					err = DB.QueryRow("INSERT INTO tsundokus (category, title, author, deadline) values ($1 , $2, $3, $4);", "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date).Scan(&tsundoku_id)
+					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline) values ($1 , $2, $3, $4);", "book", userID, tsun_book.Title, tsun_book.Author, event.Postback.Params.Date).Scan(&tsundoku_id)
 					if err != nil {
 						log.Println(err)
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
