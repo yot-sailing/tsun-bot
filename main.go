@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -27,6 +29,14 @@ type Tsundoku struct {
 	Deadline     time.Time
 	RequiredTime string
 	CreatedAt    time.Time
+}
+
+type User struct {
+	DisplayName   string
+	UserID        string
+	Language      string
+	PictureURL    string
+	StatusMessage string
 }
 type Book struct {
 	Title  string
@@ -69,8 +79,31 @@ func main() {
 				var userID int
 				err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
 				if err != nil {
-					log.Println(err)
-					return
+					if err == sql.ErrNoRows { //ここでline idに対応したuserIDの生成
+						req, _ := http.NewRequest("GET", "https://api.line.me/v2/bot/profile/"+event.Source.UserID, nil)
+						req.Header.Set("Authorization", "Bearer "+os.Getenv("CHANNEL_ACCESS_TOKEN"))
+
+						client := new(http.Client)
+						resp, err := client.Do(req)
+						if err != nil {
+							return
+							//lineのサーバからユーザ情報を取得できなかった
+						}
+						defer resp.Body.Close()
+
+						byteArray, _ := ioutil.ReadAll(resp.Body)
+						var user User
+						err = json.Unmarshal(byteArray, &user)
+						displayName := user.DisplayName
+						err = DB.QueryRow("INSERT INTO users (name, line_id) values ($1 , $2) RETURNING id;", displayName, event.Source.UserID).Scan(&userID)
+						if err != nil {
+							return
+							// usersテーブルに追加できなかった
+						}
+					} else {
+						log.Println(err)
+						return
+					}
 				}
 				switch message := event.Message.(type) {
 				case *linebot.TextMessage:
@@ -352,7 +385,7 @@ func main() {
 							if err == sql.ErrNoRows {
 								log.Printf("I got err but not problem: %s", err)
 							} else {
-								if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、できれば30秒以内に操作終えて欲しい、、")).Do(); err != nil {
+								if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
 									log.Print(err)
 									return
 								}
@@ -690,4 +723,4 @@ func getTsundokus(userID int) ([]Tsundoku, error) {
 	return results, nil
 }
 
-// できない問題、insert(book, site), prepareUser
+// できない問題、 prepareUser
