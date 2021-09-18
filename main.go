@@ -105,7 +105,7 @@ func main() {
 						want_added = false
 						var results []Tsundoku
 						var userID int
-						err := DB.QueryRow("select * from users where line_id = $1 RETURNING id;", event.Source.UserID).Scan(&userID)
+						err := DB.QueryRow("select * from users where line_id = $1;", event.Source.UserID).Scan(&userID)
 						if err != nil {
 							log.Fatal(err)
 							return
