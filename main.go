@@ -414,7 +414,7 @@ func main() {
 						}
 					}
 				case *linebot.StickerMessage:
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("スタンプよりも積ん読消化して")).Do(); err != nil {
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewStickerMessage("446", "1988")).Do(); err != nil {
 						log.Print(err)
 					}
 
@@ -442,7 +442,7 @@ func main() {
 							required_time, _ := strconv.Atoi(element.RequiredTime)
 							fmt.Println("time api", required_time, total_min)
 							if total_min >= required_time {
-								limited_results = append(results, element)
+								limited_results = append(limited_results, element)
 							}
 						}
 					}
