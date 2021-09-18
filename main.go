@@ -359,7 +359,7 @@ func main() {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
 							log.Print(err)
 						}
-					} else if strings.Contains(message.Text, "積ん読1つ消化！！(tsundokuID ") {
+					} else if strings.Contains(message.Text, "tsundokuID") {
 						tsum_del, _ := strconv.Atoi(message.Text[26:])
 						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1;", strconv.Itoa(tsum_del)) //user_idを指定することでそのuserしか消せないようになるはず??
 						if err != nil {
