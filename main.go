@@ -95,8 +95,8 @@ func main() {
 						want_added = false
 						var results []Tsundoku
 						accessTokenResponse, err := bot.IssueAccessToken(
+							os.Getenv("CHANNEL_ID"),
 							os.Getenv("SECRET"),
-							os.Getenv("CHANNEL_ACCESS_TOKEN"),
 						).Do()
 						if err != nil {
 							log.Println(err)
