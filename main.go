@@ -361,7 +361,7 @@ func main() {
 						content, title := gec.Analyse(html, opt)
 						var tsundoku_id int
 
-						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time) values ($1 , $2, $3, $4, $5) RETURNING id;", "site", userID, tsumu_url, title, strconv.Itoa(len(content)/500)).Scan(&tsundoku_id)
+						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time) values ($1 , $2, $3, $4, $5) RETURNING id;", userID, "site", tsumu_url, title, strconv.Itoa(len(content)/500)).Scan(&tsundoku_id)
 						if err != nil {
 							log.Println(err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
