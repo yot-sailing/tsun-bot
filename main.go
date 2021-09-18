@@ -361,7 +361,7 @@ func main() {
 						content, title := gec.Analyse(html, opt)
 						var tsundoku_id int
 
-						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, requiredTime) values ($1 , $2, $3, $4, $5) RETURNING id;", "site", userID, tsumu_url, title, strconv.Itoa(len(content)/500)).Scan(&tsundoku_id)
+						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time) values ($1 , $2, $3, $4, $5) RETURNING id;", "site", userID, tsumu_url, title, strconv.Itoa(len(content)/500)).Scan(&tsundoku_id)
 						if err != nil {
 							log.Println(err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
@@ -630,7 +630,7 @@ func main() {
 						return
 					}
 					var tsundoku_id int
-					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline) values ($1 , $2, $3, $4, $5);", "book", userID, tsun_book.Title, tsun_book.Author, event.Postback.Params.Date).Scan(&tsundoku_id)
+					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline) values ($1 , $2, $3, $4, $5);", userID, "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date).Scan(&tsundoku_id)
 					if err != nil {
 						log.Println(err)
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
