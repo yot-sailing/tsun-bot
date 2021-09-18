@@ -67,6 +67,7 @@ func main() {
 		for _, event := range events {
 			if event.Type == linebot.EventTypeMessage {
 				var userID int
+				log.Println("70:line id is", event.Source.UserID)
 				err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
 				if err != nil {
 					log.Fatal(err)
@@ -420,7 +421,6 @@ func main() {
 				}
 			} else if event.Type == linebot.EventTypePostback {
 				fmt.Println("line id is ", event.Source.UserID)
-				fmt.Println("423:", event)
 				var userID int
 				err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
 				if err != nil {
@@ -439,6 +439,7 @@ func main() {
 					}
 					for _, element := range results {
 						if element.Category == "site" {
+							fmt.Println(element.RequiredTime)
 							need_time := strings.Replace(element.RequiredTime, "min", "", -1)
 							required_time, _ := strconv.Atoi(need_time)
 							if total_min >= required_time {
