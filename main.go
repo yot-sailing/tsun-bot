@@ -359,6 +359,8 @@ func main() {
 							log.Print(err)
 						}
 					} else if strings.Contains(message.Text, "tsundokuID") {
+						log.Println(message.Text)
+						log.Println(len(message.Text))
 						tsum_del, _ := strconv.Atoi(message.Text[39 : len(message.Text)-1])
 						log.Println(tsum_del)
 						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1;", strconv.Itoa(tsum_del)) //user_idを指定することでそのuserしか消せないようになるはず??
