@@ -115,10 +115,26 @@ func main() {
 						defer rows.Close()
 						for rows.Next() {
 							var result Tsundoku
+							nullAuthor := new(sql.NullString)
+							nullURL := new(sql.NullString)
+							nullDeadLine := new(sql.NullTime)
+							nullRequiredTime := new(sql.NullString)
 							err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, &result.Author, &result.URL, &result.Deadline, &result.RequiredTime, &result.CreatedAt)
 							if err != nil {
 								log.Println("115:", err)
 								return
+							}
+							if nullAuthor.Valid {
+								result.Author = nullAuthor.String
+							}
+							if nullURL.Valid {
+								result.URL = nullURL.String
+							}
+							if nullDeadLine.Valid {
+								result.DeadLine = nullDeadLine.Time
+							}
+							if nullRequiredTime.Valid {
+								result.RequiredTime = nullRequiredTime.Time
 							}
 							results = append(results, result)
 						}
