@@ -110,7 +110,7 @@ func main() {
 							byteArray, _ := ioutil.ReadAll(resp.Body)
 							err := json.Unmarshal(byteArray, &results)
 							if err != nil {
-								fmt.Println("result", byteArray)
+								fmt.Println("result", resp.Body)
 								fmt.Println(err)
 								return
 							}
