@@ -439,9 +439,7 @@ func main() {
 					}
 					for _, element := range results {
 						if element.Category == "site" {
-							fmt.Println(element.RequiredTime)
-							need_time := strings.Replace(element.RequiredTime, "min", "", -1)
-							required_time, _ := strconv.Atoi(need_time)
+							required_time, _ := strconv.Atoi(element.RequiredTime)
 							if total_min >= required_time {
 								limited_results = append(results, element)
 							}
