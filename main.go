@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -624,15 +623,14 @@ func main() {
 						fmt.Println(err4)
 					}
 				} else if event.Postback.Data == "date" && title_added {
-					args.Add("deadline", event.Postback.Params.Date)
 					err = DB.QueryRow("INSERT INTO tsundokus (category, title, author, deadline) values ($1 , $2, $3, $4);", "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date)
-						if err != nil {
-							log.Println(err)
-							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
-								log.Print(err)
-								return
-							}
+					if err != nil {
+						log.Println(err)
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
+							log.Print(err)
+							return
 						}
+					}
 					if err != nil {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
 							log.Print(err)
@@ -642,11 +640,9 @@ func main() {
 					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
 						log.Print(err)
 					}
-					}
 					title_added = false
 					tsun_book = Book{}
 				}
-
 			}
 		}
 	})
