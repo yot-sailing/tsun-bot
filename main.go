@@ -267,7 +267,7 @@ func main() {
 										"action": {
 											"type": "message",
 											"label": "もう読んだよ",
-											"text": "積読1つ消化！！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
+											"text": "積ん読1つ消化！！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
 										}
 										},
 									{
@@ -361,7 +361,7 @@ func main() {
 					} else if strings.Contains(message.Text, "tsundokuID") {
 						log.Println(message.Text)
 						log.Println(len(message.Text))
-						tsum_del, _ := strconv.Atoi(message.Text[36 : len(message.Text)-1])
+						tsum_del, _ := strconv.Atoi(message.Text[39 : len(message.Text)-1])
 						log.Println(tsum_del)
 						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1;", strconv.Itoa(tsum_del)) //user_idを指定することでそのuserしか消せないようになるはず??
 						if err != nil {
@@ -590,7 +590,7 @@ func main() {
 										"action": {
 											"type": "message",
 											"label": "もう読んだよ",
-											"text": "積読1つ消化！！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
+											"text": "積ん読1つ消化！！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
 										}
 										},
 									{
