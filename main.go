@@ -117,7 +117,7 @@ func main() {
 							var result Tsundoku
 							nullAuthor := new(sql.NullString)
 							nullURL := new(sql.NullString)
-							nullDeadLine := new(sql.NullTime)
+							nullDeadLine := new(NullTime)
 							nullRequiredTime := new(sql.NullString)
 							err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, &result.Author, &result.URL, &result.Deadline, &result.RequiredTime, &result.CreatedAt)
 							if err != nil {
