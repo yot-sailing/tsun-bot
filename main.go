@@ -43,7 +43,6 @@ func main() {
 	var err error
 	DB, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
-		log.Println("here")
 		log.Fatal(err)
 	}
 	want_added := false  //本を加えたそう
@@ -133,6 +132,7 @@ func main() {
 						}
 						fmt.Println(results)
 						if len(results) == 0 {
+							fmt.Println("okok")
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("今積んでる本やサイトはないよ！")).Do(); err != nil {
 								log.Print(err)
 							}
