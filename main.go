@@ -346,9 +346,8 @@ func main() {
 						opt := gec.NewOption()
 						content, title := gec.Analyse(html, opt)
 						var tsundoku_id int
-						t, _ := time.Parse("2006-01-02", time.Now().String())
-						fmt.Println(t.String())
-						log.Println(t.String())
+						time := time.Now()
+						t := time.Format("2006-01-02")
 						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time, created_at) values ($1 , $2, $3, $4, $5, $6) RETURNING id;", userID, "site", tsumu_url, title, strconv.Itoa(len(content)/500), t.String()).Scan(&tsundoku_id)
 						if err != nil {
 							log.Println(err)
@@ -423,7 +422,6 @@ func main() {
 
 				}
 			} else if event.Type == linebot.EventTypePostback {
-				fmt.Println("line id is ", event.Source.UserID)
 				var userID int
 				err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
 				if err != nil {
@@ -618,7 +616,8 @@ func main() {
 					}
 				} else if event.Postback.Data == "date" && title_added {
 					var tsundoku_id int
-					t, _ := time.Parse("2006-01-02", time.Now().String())
+					time := time.Now()
+					t := time.Format("2006-01-02")
 					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline, created_at) values ($1 , $2, $3, $4, $5, $6);", userID, "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date, t.String()).Scan(&tsundoku_id)
 					if err != nil {
 						log.Println(err)
