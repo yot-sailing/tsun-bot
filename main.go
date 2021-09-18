@@ -110,6 +110,7 @@ func main() {
 							log.Fatal(err)
 							return
 						}
+						log.Println("userid: ", userID)
 						rows, err := DB.Query("select * from tsundokus where user_id = $1;", userID)
 						if err != nil {
 							log.Println("108:", err)
