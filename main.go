@@ -141,6 +141,7 @@ func main() {
 								result.CreatedAt = nullCreatedAt.Time
 							}
 							results = append(results, result)
+							fmt.Println(result.ID, result.URL, result.Category)
 						}
 						if err = rows.Err(); err != nil {
 							log.Println(err)
