@@ -268,7 +268,7 @@ func main() {
 										"action": {
 											"type": "message",
 											"label": "もう読んだよ",
-											"text": "already read : tsundokuID ` + strconv.Itoa(a.ID) + `"
+											"text": "積読1つ消化！！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
 										}
 										},
 									{
