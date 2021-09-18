@@ -94,7 +94,16 @@ func main() {
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
 						var results []Tsundoku
-						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus"+event.Source.UserID); err != nil { //TODO ここのURLに自分のUserIDを入れる
+						accessTokenResponse, err := bot.IssueAccessToken(
+							os.Getenv("SECRET"),
+							os.Getenv("CHANNEL_ACCESS_TOKEN"),
+						).Do()
+						if err != nil {
+							log.Println(err)
+							return
+						}
+						log.Println(accessTokenResponse.AccessToken)
+						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus" + accessTokenResponse.AccessToken); err != nil { //TODO ここのURLに自分のUserIDを入れる
 							fmt.Println("error:http get\n", err)
 						} else {
 							defer resp.Body.Close()
