@@ -143,6 +143,7 @@ func main() {
 							} else { // if site
 								column1 = "URL"
 								column2 = "読了に必要な時間"
+								a.RequiredTime = a.RequiredTime + "分"
 							}
 							jsonData += (`
 								{
@@ -231,7 +232,7 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  "text": "` + a.RequiredTime + `分" ,
+											  "text": "` + a.RequiredTime + `" ,
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
@@ -291,8 +292,8 @@ func main() {
 									"height": "sm",
 									"action": {
 										"type": "message",
-										"label": "already read",
-										"text": "already read : tsundokuID ` + strconv.Itoa(a.ID) + `"
+										"label": "もう読んだよ",
+										"text": "積ん読1つ消化！！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
 									}
 								},
 								{
@@ -345,8 +346,8 @@ func main() {
 						opt := gec.NewOption()
 						content, title := gec.Analyse(html, opt)
 						var tsundoku_id int
-
-						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time) values ($1 , $2, $3, $4, $5) RETURNING id;", userID, "site", tsumu_url, title, strconv.Itoa(len(content)/500)).Scan(&tsundoku_id)
+						t, _ := time.Parse("2006-01-02", time.Now().String())
+						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time, created_at) values ($1 , $2, $3, $4, $5, $6) RETURNING id;", userID, "site", tsumu_url, title, strconv.Itoa(len(content)/500), t.String()).Scan(&tsundoku_id)
 						if err != nil {
 							log.Println(err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
@@ -357,7 +358,7 @@ func main() {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
 							log.Print(err)
 						}
-					} else if strings.Contains(message.Text, "already read : tsundokuID ") {
+					} else if strings.Contains(message.Text, "積ん読1つ消化！！(tsundokuID ") {
 						tsum_del, _ := strconv.Atoi(message.Text[26:])
 						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1 and user_id = $2;", strconv.Itoa(tsum_del), userID) //user_idを指定することでそのuserしか消せないようになるはず
 						if err != nil {
@@ -586,8 +587,8 @@ func main() {
 										"height": "sm",
 										"action": {
 											"type": "message",
-											"label": "already read",
-											"text": "already read : tsundokuID ` + strconv.Itoa(a.ID) + `"
+											"label": "もう読んだよ",
+											"text": "積読1つ消化！！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
 										}
 										},
 									{
@@ -615,7 +616,8 @@ func main() {
 					}
 				} else if event.Postback.Data == "date" && title_added {
 					var tsundoku_id int
-					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline) values ($1 , $2, $3, $4, $5);", userID, "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date).Scan(&tsundoku_id)
+					t, _ := time.Parse("2006-01-02", time.Now().String())
+					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline, created_at) values ($1 , $2, $3, $4, $5, $6);", userID, "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date, t.String()).Scan(&tsundoku_id)
 					if err != nil {
 						log.Println(err)
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
