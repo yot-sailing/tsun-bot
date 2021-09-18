@@ -374,7 +374,7 @@ func main() {
 						}
 					} else if strings.Contains(message.Text, "already read : tsundokuID ") {
 						tsum_del, _ := strconv.Atoi(message.Text[26:])
-						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1;", strconv.Itoa(tsum_del))
+						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1 and user_id = $2;", strconv.Itoa(tsum_del), userID) //user_idを指定することでそのuserしか消せないようになるはず
 						if err != nil {
 							log.Println(err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("消せなかった、すまぬ")).Do(); err != nil {
@@ -623,6 +623,12 @@ func main() {
 						fmt.Println(err4)
 					}
 				} else if event.Postback.Data == "date" && title_added {
+					var userID int
+					err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
+					if err != nil {
+						log.Fatal(err)
+						return
+					}
 					var tsundoku_id int
 					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline) values ($1 , $2, $3, $4);", "book", userID, tsun_book.Title, tsun_book.Author, event.Postback.Params.Date).Scan(&tsundoku_id)
 					if err != nil {
