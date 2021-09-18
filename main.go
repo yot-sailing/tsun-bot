@@ -69,7 +69,7 @@ func main() {
 				var userID int
 				err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
 				if err != nil {
-					log.Fatal(err)
+					log.Println(err)
 					return
 				}
 				switch message := event.Message.(type) {
@@ -361,7 +361,7 @@ func main() {
 					} else if strings.Contains(message.Text, "tsundokuID") {
 						log.Println(message.Text)
 						log.Println(len(message.Text))
-						tsum_del, _ := strconv.Atoi(message.Text[39 : len(message.Text)-1])
+						tsum_del, _ := strconv.Atoi(message.Text[36 : len(message.Text)-1])
 						log.Println(tsum_del)
 						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1;", strconv.Itoa(tsum_del)) //user_idを指定することでそのuserしか消せないようになるはず??
 						if err != nil {
@@ -427,7 +427,7 @@ func main() {
 				var userID int
 				err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
 				if err != nil {
-					log.Fatal(err)
+					log.Println(err)
 					return
 				}
 				if event.Postback.Data == "time" {
@@ -684,4 +684,4 @@ func getTsundokus(userID int) ([]Tsundoku, error) {
 	return results, nil
 }
 
-// できない問題、delete(book, site), insert(book, site),
+// できない問題、delete(book, site), insert(book, site), prepareUser
