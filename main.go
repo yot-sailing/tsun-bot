@@ -108,7 +108,7 @@ func main() {
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
 						var results []Tsundoku
-						rows, err := DB.Query("select (id, user_id, category, title, author, url, deadline, required_time, created_at) from tsundokus where user_id = $1;", userID)
+						rows, err := DB.Query("select * from tsundokus where user_id = $1;", userID)
 						if err != nil {
 							return
 						}
@@ -120,6 +120,7 @@ func main() {
 							nullDeadLine := new(pq.NullTime)
 							nullRequiredTime := new(sql.NullString)
 							nullCreatedAt := new(pq.NullTime)
+							log.Println(rows)
 							err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, &nullAuthor, &nullURL, &nullDeadLine, &nullRequiredTime, &nullCreatedAt)
 							if err != nil {
 								log.Println("115:", err)
