@@ -102,7 +102,11 @@ func main() {
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
 						var results []Tsundoku
-						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/" + accessToken + "/tsundokus"); err != nil {
+						req, _ := http.NewRequest("GET", "https://tsuntsun-api.herokuapp.com/api/tsundokus", nil)
+						req.Header.Set("Authorization", "Bearer "+accessToken)
+
+						client := new(http.Client)
+						if resp, err := client.Do(req); err != nil {
 							fmt.Println("error:http get\n", err)
 						} else {
 							defer resp.Body.Close()
@@ -345,8 +349,12 @@ func main() {
 						args.Add("url", tsumu_url)
 						args.Add("title", title)
 						args.Add("requiredTime", strconv.Itoa(len(content)/500))
-						_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/"+accessToken+"/tsundokus", args)
-						if err != nil {
+
+						req, _ := http.NewRequest("POST", "https://tsuntsun-api.herokuapp.com/api/tsundokus", strings.NewReader(args.Encode()))
+						req.Header.Set("Authorization", "Bearer "+accessToken)
+
+						client := new(http.Client)
+						if _, err := client.Do(req); err != nil {
 							fmt.Println("Request error:", err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかったわ、ごめん")).Do(); err != nil {
 								log.Print(err)
@@ -357,9 +365,8 @@ func main() {
 						}
 					} else if strings.Contains(message.Text, "already read : tsundokuID ") {
 						tsum_del, _ := strconv.Atoi(message.Text[26:])
-						fmt.Println(tsum_del)
-						req, _ := http.NewRequest("DELETE", "https://tsuntsun-api.herokuapp.com/api/users/"+accessToken+"/tsundokus/"+strconv.Itoa(tsum_del), nil)
-						req.Header.Set("Accept", "application/json")
+						req, _ := http.NewRequest("DELETE", "https://tsuntsun-api.herokuapp.com/api/tsundokus/"+strconv.Itoa(tsum_del), nil)
+						req.Header.Set("Authorization", "Bearer "+accessToken)
 						client := new(http.Client)
 						_, err := client.Do(req)
 						if err != nil {
@@ -420,7 +427,10 @@ func main() {
 					hour, _ := strconv.Atoi(event.Postback.Params.Time[:2])
 					min, _ := strconv.Atoi(event.Postback.Params.Time[3:])
 					total_min := hour*60 + min
-					resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/" + accessToken + "/time/" + strconv.Itoa(total_min))
+					req, _ := http.NewRequest("GET", "https://tsuntsun-api.herokuapp.com/api/time/"+strconv.Itoa(total_min), nil)
+					req.Header.Set("Authorization", "Bearer "+accessToken)
+					client := new(http.Client)
+					resp, err := client.Do(req)
 					if err != nil {
 						fmt.Println(err)
 						return
@@ -606,7 +616,10 @@ func main() {
 						args.Add("author", tsun_book.Author)
 					}
 					args.Add("deadline", event.Postback.Params.Date)
-					_, err = http.PostForm("https://tsuntsun-api.herokuapp.com/api/users/"+accessToken+"/tsundokus", args)
+					req, _ := http.NewRequest("POST", "https://tsuntsun-api.herokuapp.com/api/tsundokus", strings.NewReader(args.Encode()))
+					req.Header.Set("Authorization", "Bearer "+accessToken)
+					client := new(http.Client)
+					_, err := client.Do(req)
 					if err != nil {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった！すまぬ")).Do(); err != nil {
 							log.Print(err)
