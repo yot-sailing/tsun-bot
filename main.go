@@ -12,6 +12,8 @@ import (
 	"strings"
 	"time"
 
+	"database/sql"
+
 	"github.com/PuerkitoBio/goquery"
 	"github.com/line/line-bot-sdk-go/linebot"
 	"github.com/yukihir0/gec"
@@ -33,9 +35,16 @@ type Book struct {
 	Author string
 }
 
+var DB *sql.DB
+
 var tsun_book Book
 
 func main() {
+	var err error
+	DB, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Fatal(err)
+	}
 	want_added := false  //本を加えたそう
 	title_added := false //タイトルを加えてもらっています
 	bot, err := linebot.New(
@@ -57,15 +66,6 @@ func main() {
 			}
 			return
 		}
-		accessTokenResponse, err := bot.IssueAccessToken(
-			os.Getenv("CHANNEL_ID"),
-			os.Getenv("SECRET"),
-		).Do()
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		accessToken := accessTokenResponse.AccessToken
 		for _, event := range events {
 			if event.Type == linebot.EventTypeMessage {
 				switch message := event.Message.(type) {
@@ -102,22 +102,39 @@ func main() {
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
 						var results []Tsundoku
-						req, _ := http.NewRequest("GET", "https://tsuntsun-api.herokuapp.com/api/tsundokus", nil)
-						req.Header.Set("Authorization", "Bearer "+accessToken)
-
-						client := new(http.Client)
-						if resp, err := client.Do(req); err != nil {
-							fmt.Println("error:http get\n", err)
-						} else {
-							defer resp.Body.Close()
-							byteArray, _ := ioutil.ReadAll(resp.Body)
-							err := json.Unmarshal(byteArray, &results)
+						rows, err := DB.Query("select * from tsundokus where user_id = $1;", event.Source.UserID)
+						if err != nil {
+							log.Println(err)
+						}
+						defer rows.Close()
+						for rows.Next() {
+							var result Tsundoku
+							err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, &result.Author, &result.URL, &result.Deadline, &result.RequiredTime, &result.CreatedAt)
 							if err != nil {
-								fmt.Println("result", resp.Body)
-								fmt.Println(err)
+								log.Println(err)
 								return
 							}
+							results = append(results, result)
 						}
+						if err = rows.Err(); err != nil {
+							log.Println(err)
+							return
+						}
+						// req, _ := http.NewRequest("GET", "https://tsuntsun-api.herokuapp.com/api/tsundokus", nil)
+
+						// client := new(http.Client)
+						// if resp, err := client.Do(req); err != nil {
+						// 	fmt.Println("error:http get\n", err)
+						// } else {
+						// 	defer resp.Body.Close()
+						// 	byteArray, _ := ioutil.ReadAll(resp.Body)
+						// 	err := json.Unmarshal(byteArray, &results)
+						// 	if err != nil {
+						// 		fmt.Println("result", resp.Body)
+						// 		fmt.Println(err)
+						// 		return
+						// 	}
+						// }
 						if len(results) > 12 {
 							results = results[:12]
 						}
@@ -351,7 +368,6 @@ func main() {
 						args.Add("requiredTime", strconv.Itoa(len(content)/500))
 
 						req, _ := http.NewRequest("POST", "https://tsuntsun-api.herokuapp.com/api/tsundokus", strings.NewReader(args.Encode()))
-						req.Header.Set("Authorization", "Bearer "+accessToken)
 
 						client := new(http.Client)
 						if _, err := client.Do(req); err != nil {
@@ -366,7 +382,6 @@ func main() {
 					} else if strings.Contains(message.Text, "already read : tsundokuID ") {
 						tsum_del, _ := strconv.Atoi(message.Text[26:])
 						req, _ := http.NewRequest("DELETE", "https://tsuntsun-api.herokuapp.com/api/tsundokus/"+strconv.Itoa(tsum_del), nil)
-						req.Header.Set("Authorization", "Bearer "+accessToken)
 						client := new(http.Client)
 						_, err := client.Do(req)
 						if err != nil {
@@ -428,7 +443,6 @@ func main() {
 					min, _ := strconv.Atoi(event.Postback.Params.Time[3:])
 					total_min := hour*60 + min
 					req, _ := http.NewRequest("GET", "https://tsuntsun-api.herokuapp.com/api/time/"+strconv.Itoa(total_min), nil)
-					req.Header.Set("Authorization", "Bearer "+accessToken)
 					client := new(http.Client)
 					resp, err := client.Do(req)
 					if err != nil {
@@ -617,7 +631,6 @@ func main() {
 					}
 					args.Add("deadline", event.Postback.Params.Date)
 					req, _ := http.NewRequest("POST", "https://tsuntsun-api.herokuapp.com/api/tsundokus", strings.NewReader(args.Encode()))
-					req.Header.Set("Authorization", "Bearer "+accessToken)
 					client := new(http.Client)
 					_, err := client.Do(req)
 					if err != nil {
