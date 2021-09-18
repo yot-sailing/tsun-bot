@@ -108,7 +108,7 @@ func main() {
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
 						var results []Tsundoku
-						rows, err := DB.Query("select * from tsundokus where user_id = $1;", userID)
+						rows, err := DB.Query("select (id, user_id, category, title, author, url, deadline, required_time, created_at) from tsundokus where user_id = $1;", userID)
 						if err != nil {
 							return
 						}
@@ -434,7 +434,7 @@ func main() {
 									"https://ddnavi.com/wp-content/uploads/2020/04/tsundoku.jpg",
 									"本をいつまでに読むか決めます",
 									"何月何日に読み終えたいか教えてね",
-									linebot.NewDatetimePickerAction("Date", "date", "date", "2021-07-04", "2025-07-02", "2021-07-04"),
+									linebot.NewDatetimePickerAction("Date", "date", "date", "2021-09-18", "2025-07-02", "2021-09-18"),
 								),
 							)
 							_, err = bot.ReplyMessage(event.ReplyToken, resp).Do()
@@ -653,12 +653,6 @@ func main() {
 					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline) values ($1 , $2, $3, $4, $5);", userID, "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date).Scan(&tsundoku_id)
 					if err != nil {
 						log.Println(err)
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
-							log.Print(err)
-							return
-						}
-					}
-					if err != nil {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
 							log.Print(err)
 							return
