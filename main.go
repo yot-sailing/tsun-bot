@@ -630,7 +630,7 @@ func main() {
 						return
 					}
 					var tsundoku_id int
-					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline) values ($1 , $2, $3, $4);", "book", userID, tsun_book.Title, tsun_book.Author, event.Postback.Params.Date).Scan(&tsundoku_id)
+					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline) values ($1 , $2, $3, $4, $5);", "book", userID, tsun_book.Title, tsun_book.Author, event.Postback.Params.Date).Scan(&tsundoku_id)
 					if err != nil {
 						log.Println(err)
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
