@@ -103,7 +103,7 @@ func main() {
 							return
 						}
 						log.Println(accessTokenResponse.AccessToken)
-						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/1/tsundokus" + accessTokenResponse.AccessToken); err != nil { //TODO ここのURLに自分のUserIDを入れる
+						if resp, err := http.Get("https://tsuntsun-api.herokuapp.com/api/users/" + accessTokenResponse.AccessToken + "/tsundokus"); err != nil { //TODO ここのURLに自分のUserIDを入れる
 							fmt.Println("error:http get\n", err)
 						} else {
 							defer resp.Body.Close()
