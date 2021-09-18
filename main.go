@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -107,43 +105,9 @@ func main() {
 						}
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
-						var results []Tsundoku
-						rows, err := DB.Query("select * from tsundokus where user_id = $1;", userID)
-						if err != nil {
-							return
-						}
-						defer rows.Close()
-						for rows.Next() {
-							var result Tsundoku
-							nullAuthor := new(sql.NullString)
-							nullURL := new(sql.NullString)
-							nullDeadLine := new(pq.NullTime)
-							nullRequiredTime := new(sql.NullString)
-							nullCreatedAt := new(pq.NullTime)
-							err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, nullAuthor, nullURL, nullDeadLine, nullRequiredTime, nullCreatedAt)
-							if err != nil {
-								log.Println("125:", err)
-								return
-							}
-							if nullAuthor.Valid {
-								result.Author = nullAuthor.String
-							}
-							if nullURL.Valid {
-								result.URL = nullURL.String
-							}
-							if nullDeadLine.Valid {
-								result.Deadline = nullDeadLine.Time
-							}
-							if nullRequiredTime.Valid {
-								result.RequiredTime = nullRequiredTime.String
-							}
-							if nullCreatedAt.Valid {
-								result.CreatedAt = nullCreatedAt.Time
-							}
-							results = append(results, result)
 
-						}
-						if err = rows.Err(); err != nil {
+						results, err := getTsundokus(userID)
+						if err != nil {
 							log.Println(err)
 							return
 						}
@@ -455,33 +419,34 @@ func main() {
 
 				}
 			} else if event.Type == linebot.EventTypePostback {
+				fmt.Println("line id is ", event.Source.UserID)
+				fmt.Println("423:", event)
 				var userID int
 				err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
 				if err != nil {
 					log.Fatal(err)
 					return
 				}
-				fmt.Println(event.Postback.Params)
-				fmt.Println(event.Postback)
 				if event.Postback.Data == "time" {
 					limited_results := []Tsundoku{}
 					hour, _ := strconv.Atoi(event.Postback.Params.Time[:2])
 					min, _ := strconv.Atoi(event.Postback.Params.Time[3:])
 					total_min := hour*60 + min
-					req, _ := http.NewRequest("GET", "https://tsuntsun-api.herokuapp.com/api/time/"+strconv.Itoa(total_min), nil)
-					client := new(http.Client)
-					resp, err := client.Do(req)
+					results, err := getTsundokus(userID)
 					if err != nil {
-						fmt.Println(err)
+						log.Println(err)
 						return
-					} else {
-						defer resp.Body.Close()
-						byteArray, _ := ioutil.ReadAll(resp.Body)
-						err := json.Unmarshal(byteArray, &limited_results)
-						if err != nil {
-							fmt.Println(err)
+					}
+					for _, element := range results {
+						if element.Category == "site" {
+							need_time := strings.Replace(element.RequiredTime, "min", "", -1)
+							required_time, _ := strconv.Atoi(need_time)
+							if total_min >= required_time {
+								limited_results = append(results, element)
+							}
 						}
 					}
+
 					if len(limited_results) == 0 {
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(strconv.Itoa(total_min)+"分以内で読めるサイトは無いわ、、")).Do(); err != nil {
 							log.Print(err)
@@ -670,4 +635,46 @@ func main() {
 	if err := http.ListenAndServe(":"+os.Getenv("PORT"), nil); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func getTsundokus(userID int) ([]Tsundoku, error) {
+	var results []Tsundoku
+	rows, err := DB.Query("select * from tsundokus where user_id = $1;", userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var result Tsundoku
+		nullAuthor := new(sql.NullString)
+		nullURL := new(sql.NullString)
+		nullDeadLine := new(pq.NullTime)
+		nullRequiredTime := new(sql.NullString)
+		nullCreatedAt := new(pq.NullTime)
+		err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, nullAuthor, nullURL, nullDeadLine, nullRequiredTime, nullCreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		if nullAuthor.Valid {
+			result.Author = nullAuthor.String
+		}
+		if nullURL.Valid {
+			result.URL = nullURL.String
+		}
+		if nullDeadLine.Valid {
+			result.Deadline = nullDeadLine.Time
+		}
+		if nullRequiredTime.Valid {
+			result.RequiredTime = nullRequiredTime.String
+		}
+		if nullCreatedAt.Valid {
+			result.CreatedAt = nullCreatedAt.Time
+		}
+		results = append(results, result)
+
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return results, nil
 }
