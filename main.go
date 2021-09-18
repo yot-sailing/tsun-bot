@@ -383,7 +383,7 @@ func main() {
 							}
 							return
 						}
-						_, err := result.RowsAffected()
+						_, err = result.RowsAffected()
 						if err != nil {
 							fmt.Println("Request error:", err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("消せなかった、すまぬ")).Do(); err != nil {
