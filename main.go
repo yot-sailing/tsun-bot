@@ -67,7 +67,6 @@ func main() {
 		for _, event := range events {
 			if event.Type == linebot.EventTypeMessage {
 				var userID int
-				log.Println("70:line id is", event.Source.UserID)
 				err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
 				if err != nil {
 					log.Fatal(err)
@@ -360,7 +359,8 @@ func main() {
 							log.Print(err)
 						}
 					} else if strings.Contains(message.Text, "tsundokuID") {
-						tsum_del, _ := strconv.Atoi(message.Text[26:])
+						tsum_del, _ := strconv.Atoi(message.Text[9:])
+						log.Println(tsum_del)
 						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1;", strconv.Itoa(tsum_del)) //user_idを指定することでそのuserしか消せないようになるはず??
 						if err != nil {
 							log.Println(err)
@@ -621,7 +621,7 @@ func main() {
 					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline, created_at) values ($1 , $2, $3, $4, $5, $6);", userID, "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date, t).Scan(&tsundoku_id)
 					if err != nil {
 						log.Println(err)
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、できれば30秒以内に操作終えて欲しい、、")).Do(); err != nil {
 							log.Print(err)
 							return
 						}
