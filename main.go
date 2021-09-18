@@ -43,6 +43,7 @@ func main() {
 	var err error
 	DB, err = sql.Open("postgres", os.Getenv("DATABASE_URL"))
 	if err != nil {
+		log.Println("here")
 		log.Fatal(err)
 	}
 	want_added := false  //本を加えたそう
@@ -104,14 +105,14 @@ func main() {
 						var results []Tsundoku
 						rows, err := DB.Query("select * from tsundokus where user_id = $1;", event.Source.UserID)
 						if err != nil {
-							log.Println(err)
+							log.Println("108:", err)
 						}
 						defer rows.Close()
 						for rows.Next() {
 							var result Tsundoku
 							err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, &result.Author, &result.URL, &result.Deadline, &result.RequiredTime, &result.CreatedAt)
 							if err != nil {
-								log.Println(err)
+								log.Println("115:", err)
 								return
 							}
 							results = append(results, result)
