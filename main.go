@@ -15,6 +15,7 @@ import (
 	"database/sql"
 
 	"github.com/PuerkitoBio/goquery"
+	_ "github.com/lib/pq"
 	"github.com/line/line-bot-sdk-go/linebot"
 	"github.com/yukihir0/gec"
 )
