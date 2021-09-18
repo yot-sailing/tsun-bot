@@ -70,6 +70,12 @@ func main() {
 		}
 		for _, event := range events {
 			if event.Type == linebot.EventTypeMessage {
+				var userID int
+				err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
+				if err != nil {
+					log.Fatal(err)
+					return
+				}
 				switch message := event.Message.(type) {
 				case *linebot.TextMessage:
 					if message.Text == "今暇" {
@@ -104,14 +110,7 @@ func main() {
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
 						var results []Tsundoku
-						var userID int
-						err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
-						if err != nil {
-							log.Fatal(err)
-							return
-						}
-						log.Println("userid: ", userID)
-						rows, err := DB.Query("select * from tsundokus where user_id = $1;", userID)
+						rows, err := DB.Query("select * from tsundokus where userID = $1;", userID)
 						if err != nil {
 							log.Println("108:", err)
 						}
@@ -129,25 +128,17 @@ func main() {
 							log.Println(err)
 							return
 						}
-						// req, _ := http.NewRequest("GET", "https://tsuntsun-api.herokuapp.com/api/tsundokus", nil)
 
-						// client := new(http.Client)
-						// if resp, err := client.Do(req); err != nil {
-						// 	fmt.Println("error:http get\n", err)
-						// } else {
-						// 	defer resp.Body.Close()
-						// 	byteArray, _ := ioutil.ReadAll(resp.Body)
-						// 	err := json.Unmarshal(byteArray, &results)
-						// 	if err != nil {
-						// 		fmt.Println("result", resp.Body)
-						// 		fmt.Println(err)
-						// 		return
-						// 	}
-						// }
 						if len(results) > 12 {
 							results = results[:12]
 						}
 						fmt.Println(results)
+						if len(results) == 0 {
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("今積んでる本やサイトはないよ！")).Do(); err != nil {
+								log.Print(err)
+							}
+							return
+						}
 						jsonData := (`
 									{
 									"type": "carousel",
@@ -370,19 +361,13 @@ func main() {
 						}
 						opt := gec.NewOption()
 						content, title := gec.Analyse(html, opt)
-						args := url.Values{}
-						args.Add("category", "site")
-						args.Add("url", tsumu_url)
-						args.Add("title", title)
-						args.Add("requiredTime", strconv.Itoa(len(content)/500))
 
-						req, _ := http.NewRequest("POST", "https://tsuntsun-api.herokuapp.com/api/tsundokus", strings.NewReader(args.Encode()))
-
-						client := new(http.Client)
-						if _, err := client.Do(req); err != nil {
-							fmt.Println("Request error:", err)
-							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかったわ、ごめん")).Do(); err != nil {
+						err = DB.QueryRow("INSERT INTO tsundokus (category, url, title, requiredTime) values ($1 , $2, $3, $4);", "site", tsumu_url, title, strconv.Itoa(len(content)/500))
+						if err != nil {
+							log.Println(err)
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
 								log.Print(err)
+								return
 							}
 						}
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
@@ -390,14 +375,21 @@ func main() {
 						}
 					} else if strings.Contains(message.Text, "already read : tsundokuID ") {
 						tsum_del, _ := strconv.Atoi(message.Text[26:])
-						req, _ := http.NewRequest("DELETE", "https://tsuntsun-api.herokuapp.com/api/tsundokus/"+strconv.Itoa(tsum_del), nil)
-						client := new(http.Client)
-						_, err := client.Do(req)
+						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1;", strconv.Itoa(tsum_del))
+						if err != nil {
+							log.Println(err)
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("消せなかった、すまぬ")).Do(); err != nil {
+								log.Print(err)
+							}
+							return
+						}
+						rowsDeleted, err := result.RowsAffected()
 						if err != nil {
 							fmt.Println("Request error:", err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("消せなかった、すまぬ")).Do(); err != nil {
 								log.Print(err)
 							}
+							return
 						}
 						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("えらい！よく読めました！")).Do(); err != nil {
 							log.Print(err)
@@ -632,24 +624,24 @@ func main() {
 						fmt.Println(err4)
 					}
 				} else if event.Postback.Data == "date" && title_added {
-					args := url.Values{}
-					args.Add("category", "book")
-					args.Add("title", tsun_book.Title)
-					if tsun_book.Author != "" {
-						args.Add("author", tsun_book.Author)
-					}
 					args.Add("deadline", event.Postback.Params.Date)
-					req, _ := http.NewRequest("POST", "https://tsuntsun-api.herokuapp.com/api/tsundokus", strings.NewReader(args.Encode()))
-					client := new(http.Client)
-					_, err := client.Do(req)
+					err = DB.QueryRow("INSERT INTO tsundokus (category, title, author, deadline) values ($1 , $2, $3, $4);", "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date)
+						if err != nil {
+							log.Println(err)
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
+								log.Print(err)
+								return
+							}
+						}
 					if err != nil {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった！すまぬ")).Do(); err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
 							log.Print(err)
+							return
 						}
-					} else {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
-							log.Print(err)
-						}
+					}
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
+						log.Print(err)
+					}
 					}
 					title_added = false
 					tsun_book = Book{}
