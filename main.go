@@ -125,7 +125,6 @@ func main() {
 								log.Println("125:", err)
 								return
 							}
-							fmt.Println(result.ID, result.URL, result.Category)
 							if nullAuthor.Valid {
 								result.Author = nullAuthor.String
 							}
@@ -152,7 +151,6 @@ func main() {
 						if len(results) > 12 {
 							results = results[:12]
 						}
-						fmt.Println(results[0].ID, results[0].URL, results[0].Category)
 						if len(results) == 0 {
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("今積んでる本やサイトはないよ！")).Do(); err != nil {
 								log.Print(err)
@@ -457,6 +455,12 @@ func main() {
 
 				}
 			} else if event.Type == linebot.EventTypePostback {
+				var userID int
+				err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
+				if err != nil {
+					log.Fatal(err)
+					return
+				}
 				fmt.Println(event.Postback.Params)
 				fmt.Println(event.Postback)
 				if event.Postback.Data == "time" {
@@ -645,12 +649,6 @@ func main() {
 						fmt.Println(err4)
 					}
 				} else if event.Postback.Data == "date" && title_added {
-					var userID int
-					err := DB.QueryRow("select id from users where line_id = $1;", event.Source.UserID).Scan(&userID)
-					if err != nil {
-						log.Fatal(err)
-						return
-					}
 					var tsundoku_id int
 					err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, title, author, deadline) values ($1 , $2, $3, $4, $5);", userID, "book", tsun_book.Title, tsun_book.Author, event.Postback.Params.Date).Scan(&tsundoku_id)
 					if err != nil {
