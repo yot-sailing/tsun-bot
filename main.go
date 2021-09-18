@@ -78,7 +78,7 @@ func main() {
 								"https://ddnavi.com/wp-content/uploads/2020/04/tsundoku.jpg",
 								"積ん読消化！！",
 								"何時間何分暇か選んでね",
-								linebot.NewDatetimePickerAction("Time", "time", "time", "00:00", "23:59", "00:00"),
+								linebot.NewDatetimePickerAction("暇な時間入力", "time", "time", "00:00", "23:59", "00:00"),
 							),
 						)
 
