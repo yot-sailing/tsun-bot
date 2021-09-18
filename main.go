@@ -361,7 +361,7 @@ func main() {
 						}
 					} else if strings.Contains(message.Text, "積ん読1つ消化！！(tsundokuID ") {
 						tsum_del, _ := strconv.Atoi(message.Text[26:])
-						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1 and user_id = $2;", strconv.Itoa(tsum_del), userID) //user_idを指定することでそのuserしか消せないようになるはず
+						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1;", strconv.Itoa(tsum_del)) //user_idを指定することでそのuserしか消せないようになるはず??
 						if err != nil {
 							log.Println(err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("消せなかった、すまぬ")).Do(); err != nil {
