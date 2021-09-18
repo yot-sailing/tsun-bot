@@ -440,6 +440,7 @@ func main() {
 					for _, element := range results {
 						if element.Category == "site" {
 							required_time, _ := strconv.Atoi(element.RequiredTime)
+							fmt.Println("time api", required_time, total_min)
 							if total_min >= required_time {
 								limited_results = append(results, element)
 							}
