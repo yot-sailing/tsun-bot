@@ -347,7 +347,8 @@ func main() {
 						content, title := gec.Analyse(html, opt)
 						var tsundoku_id int
 						t, _ := time.Parse("2006-01-02", time.Now().String())
-						fmt.Pritnln(t.String())
+						fmt.Println(t.String())
+						log.Println(t.String())
 						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time, created_at) values ($1 , $2, $3, $4, $5, $6) RETURNING id;", userID, "site", tsumu_url, title, strconv.Itoa(len(content)/500), t.String()).Scan(&tsundoku_id)
 						if err != nil {
 							log.Println(err)
@@ -578,7 +579,7 @@ func main() {
 									"height": "sm",
 									"action": {
 										"type": "uri",
-										"label": "read now",
+										"label": "今から読む",
 										"uri": "` + a.URL + `"
 									}
 									},
