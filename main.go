@@ -347,6 +347,7 @@ func main() {
 						content, title := gec.Analyse(html, opt)
 						var tsundoku_id int
 						t, _ := time.Parse("2006-01-02", time.Now().String())
+						fmt.Pritnln(t.String())
 						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time, created_at) values ($1 , $2, $3, $4, $5, $6) RETURNING id;", userID, "site", tsumu_url, title, strconv.Itoa(len(content)/500), t.String()).Scan(&tsundoku_id)
 						if err != nil {
 							log.Println(err)
@@ -370,7 +371,7 @@ func main() {
 						}
 						_, err = result.RowsAffected()
 						if err != nil {
-							fmt.Println("Request error:", err)
+							log.Println("Request error:", err)
 							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("消せなかった、すまぬ")).Do(); err != nil {
 								log.Print(err)
 							}
