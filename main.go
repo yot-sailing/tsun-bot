@@ -131,10 +131,10 @@ func main() {
 								result.URL = nullURL.String
 							}
 							if nullDeadLine.Valid {
-								result.DeadLine = nullDeadLine.Time
+								result.Deadline = nullDeadLine.Time
 							}
 							if nullRequiredTime.Valid {
-								result.RequiredTime = nullRequiredTime.Time
+								result.RequiredTime = nullRequiredTime.String
 							}
 							results = append(results, result)
 						}
