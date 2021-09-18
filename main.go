@@ -108,7 +108,7 @@ func main() {
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
 						var results []Tsundoku
-						rows, err := DB.Query("select * from tsundokus where userID = $1;", userID)
+						rows, err := DB.Query("select * from tsundokus where user_id = $1;", userID)
 						if err != nil {
 							log.Println("108:", err)
 						}
