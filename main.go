@@ -14,7 +14,7 @@ import (
 	"database/sql"
 
 	"github.com/PuerkitoBio/goquery"
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 	"github.com/line/line-bot-sdk-go/linebot"
 	"github.com/yukihir0/gec"
 )
@@ -117,7 +117,7 @@ func main() {
 							var result Tsundoku
 							nullAuthor := new(sql.NullString)
 							nullURL := new(sql.NullString)
-							nullDeadLine := new(NullTime)
+							nullDeadLine := new(pq.NullTime)
 							nullRequiredTime := new(sql.NullString)
 							err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, &result.Author, &result.URL, &result.Deadline, &result.RequiredTime, &result.CreatedAt)
 							if err != nil {
