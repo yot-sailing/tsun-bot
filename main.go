@@ -95,7 +95,8 @@ func main() {
 						var user User
 						err = json.Unmarshal(byteArray, &user)
 						displayName := user.DisplayName
-						err = DB.QueryRow("INSERT INTO users (name, line_id) values ($1 , $2) RETURNING id;", displayName, event.Source.UserID).Scan(&userID)
+						createdAt := time.Now().String() //ここちょっと怪しみ
+						err = DB.QueryRow("INSERT INTO users (name, line_id, created_at, updated_at) values ($1 , $2, $3, $4) RETURNING id;", displayName, event.Source.UserID, createdAt, createdAt).Scan(&userID)
 						if err != nil {
 							return
 							// usersテーブルに追加できなかった
@@ -722,5 +723,3 @@ func getTsundokus(userID int) ([]Tsundoku, error) {
 	}
 	return results, nil
 }
-
-// できない問題、 prepareUser
