@@ -369,7 +369,7 @@ func main() {
 						//ここで 積ん読追加のAPIを呼ぶ、著者とタイトル、どう判断すべきか分からんからタイトルだけで
 					} else if strings.Contains(message.Text, "http") {
 						tsumu_url := message.Text
-						requiredTime, err := countRequiredTime(tsumu_url)
+						requiredTime, title, err := countRequiredTime(tsumu_url)
 						var requiredTimeString string
 						if err == nil {
 							requiredTimeString = strconv.Itoa(requiredTime)
