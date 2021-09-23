@@ -374,7 +374,7 @@ func main() {
 						if err == nil {
 							requiredTimeString = strconv.Itoa(requiredTime)
 						} else {
-							requiredTimeString = "cannot compute.."
+							requiredTimeString = "---"
 						}
 						var tsundoku_id int
 						time := time.Now()
