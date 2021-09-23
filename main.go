@@ -722,38 +722,38 @@ func getTsundokus(userID int) ([]Tsundoku, error) {
 	return results, nil
 }
 
-func countRequiredTime(url string) (int, error) {
+func countRequiredTime(url string) (int, string, error) {
 	res, err := http.Get(url)
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 	defer res.Body.Close()
 	buf, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return 0, nil
+		return 0, "", nil
 	}
 
 	det := chardet.NewTextDetector()
 	detResult, err := det.DetectBest(buf)
 
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 
 	bReader := bytes.NewReader(buf)
 	reader, err := charset.NewReaderLabel(detResult.Charset, bReader)
 
 	if err != nil {
-		return 0, nil
+		return 0, "", nil
 	}
 
 	doc, err := goquery.NewDocumentFromReader(reader)
 	if err != nil {
-		return 0, nil
+		return 0, "", nil
 	}
 	doc.Find("*:empty").Remove()
 	doc.Find("script").Remove()
 	doc.Find("style").Remove()
 	totalContents := utf8.RuneCountInString(doc.Find("body").Text())
-	return totalContents / 500, nil
+	return totalContents / 500, doc.Find("title").Text(), nil
 }
