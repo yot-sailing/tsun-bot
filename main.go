@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,13 +11,15 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode/utf8"
 
 	"database/sql"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/lib/pq"
 	"github.com/line/line-bot-sdk-go/linebot"
-	"github.com/yukihir0/gec"
+	"github.com/saintfish/chardet"
+	"golang.org/x/net/html/charset"
 )
 
 type Tsundoku struct {
@@ -366,22 +369,16 @@ func main() {
 						//ここで 積ん読追加のAPIを呼ぶ、著者とタイトル、どう判断すべきか分からんからタイトルだけで
 					} else if strings.Contains(message.Text, "http") {
 						tsumu_url := message.Text
-						fmt.Println(tsumu_url)
-						// URLからタイトルと本文の長さを取得する
-						doc, err := goquery.NewDocument(tsumu_url)
-						if err != nil {
-							fmt.Println("err", err)
+						requiredTime, err := countRequiredTime(tsumu_url)
+						if err == nil {
+							requiredTime = strconv.Itoa(requiredTime)
+						} else {
+							requiredTime = "cannot compute.."
 						}
-						html, err := doc.Html()
-						if err != nil {
-							fmt.Println("err", err)
-						}
-						opt := gec.NewOption()
-						content, title := gec.Analyse(html, opt)
 						var tsundoku_id int
 						time := time.Now()
 						t := time.Format("2006-01-02")
-						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time, created_at) values ($1 , $2, $3, $4, $5, $6) RETURNING id;", userID, "site", tsumu_url, title, strconv.Itoa(len(content)/500), t).Scan(&tsundoku_id)
+						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time, created_at) values ($1 , $2, $3, $4, $5, $6) RETURNING id;", userID, "site", tsumu_url, title, requiredTime, t).Scan(&tsundoku_id)
 						if err != nil {
 							if err == sql.ErrNoRows {
 								log.Printf("I got err but not problem: %s", err)
@@ -722,4 +719,40 @@ func getTsundokus(userID int) ([]Tsundoku, error) {
 		return nil, err
 	}
 	return results, nil
+}
+
+func countRequiredTime(url string) (int, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		return 0, err
+	}
+	defer res.Body.Close()
+	buf, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return 0, nil
+	}
+
+	det := chardet.NewTextDetector()
+	detResult, err := det.DetectBest(buf)
+
+	if err != nil {
+		return 0, err
+	}
+
+	bReader := bytes.NewReader(buf)
+	reader, err := charset.NewReaderLabel(detResult.Charset, bReader)
+
+	if err != nil {
+		return 0, nil
+	}
+
+	doc, err := goquery.NewDocumentFromReader(reader)
+	if err != nil {
+		return 0, nil
+	}
+	doc.Find("*:empty").Remove()
+	doc.Find("script").Remove()
+	doc.Find("style").Remove()
+	totalContents := utf8.RuneCountInString(doc.Find("body").Text())
+	return totalContents / 500, nil
 }
