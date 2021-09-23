@@ -370,15 +370,16 @@ func main() {
 					} else if strings.Contains(message.Text, "http") {
 						tsumu_url := message.Text
 						requiredTime, err := countRequiredTime(tsumu_url)
+						var requiredTimeString string
 						if err == nil {
-							requiredTime = strconv.Itoa(requiredTime)
+							requiredTimeString = strconv.Itoa(requiredTime)
 						} else {
-							requiredTime = "cannot compute.."
+							requiredTimeString = "cannot compute.."
 						}
 						var tsundoku_id int
 						time := time.Now()
 						t := time.Format("2006-01-02")
-						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time, created_at) values ($1 , $2, $3, $4, $5, $6) RETURNING id;", userID, "site", tsumu_url, title, requiredTime, t).Scan(&tsundoku_id)
+						err = DB.QueryRow("INSERT INTO tsundokus (user_id, category, url, title, required_time, created_at) values ($1 , $2, $3, $4, $5, $6) RETURNING id;", userID, "site", tsumu_url, title, requiredTimeString, t).Scan(&tsundoku_id)
 						if err != nil {
 							if err == sql.ErrNoRows {
 								log.Printf("I got err but not problem: %s", err)
