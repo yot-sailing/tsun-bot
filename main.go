@@ -410,7 +410,7 @@ func main() {
 									"https://ddnavi.com/wp-content/uploads/2020/04/tsundoku.jpg",
 									"本をいつまでに読むか決めます",
 									"何月何日までに読み終えたいか教えてください",
-									linebot.NewDatetimePickerAction("Date", "date", "date", "2021-09-18", "2025-07-02", "2021-09-18"),
+									linebot.NewDatetimePickerAction("Date", "date", "date", "2021-09-25", "2025-07-02", "2021-09-18"),
 								),
 							)
 							_, err = bot.ReplyMessage(event.ReplyToken, resp).Do()
