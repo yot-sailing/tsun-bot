@@ -88,7 +88,7 @@ func main() {
 				}
 				switch message := event.Message.(type) {
 				case *linebot.TextMessage:
-					if message.Text == "今暇" {
+					if message.Text == "積ん読を消化する" {
 						want_added = false
 						resp := linebot.NewTemplateMessage(
 							"this is a buttons template",
@@ -104,7 +104,7 @@ func main() {
 						if err != nil {
 							log.Print(err)
 						}
-					} else if message.Text == "積みます" {
+					} else if message.Text == "積む" {
 						resp := linebot.NewTemplateMessage(
 							"this is a confirm template",
 							linebot.NewConfirmTemplate(
@@ -117,7 +117,7 @@ func main() {
 						if err != nil {
 							log.Print(err)
 						}
-					} else if message.Text == "今の積ん読リストを見せて" {
+					} else if message.Text == "積ん読リストを表示する" {
 						want_added = false
 
 						results, err := util.GetTsundokus(DB, userID)
