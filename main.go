@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"main/model"
+	"main/util"
 	"net/http"
 	"os"
 	"strconv"
@@ -17,7 +18,6 @@ import (
 	"database/sql"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/lib/pq"
 	"github.com/line/line-bot-sdk-go/linebot"
 	"github.com/saintfish/chardet"
 	"golang.org/x/net/html/charset"
@@ -120,7 +120,7 @@ func main() {
 					} else if message.Text == "今の積ん読リストを見せて" {
 						want_added = false
 
-						results, err := getTsundokus(userID)
+						results, err := util.GetTsundokus(DB, userID)
 						if err != nil {
 							log.Println(err)
 							return
@@ -130,7 +130,7 @@ func main() {
 							results = results[:12]
 						}
 						if len(results) == 0 {
-							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("今積んでる本やサイトはないよ！")).Do(); err != nil {
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("今積んでる本やサイトはありません")).Do(); err != nil {
 								log.Print(err)
 							}
 							return
@@ -147,7 +147,7 @@ func main() {
 								column1 = "著者"
 								column2 = "この日までに読む"
 								if a.Author == "" {
-									a.URL = "まだ入力されてないヨ"
+									a.URL = "著者が入力されていません"
 								} else {
 									a.URL = a.Author //ここちょっと汚い
 								}
@@ -447,7 +447,7 @@ func main() {
 					hour, _ := strconv.Atoi(event.Postback.Params.Time[:2])
 					min, _ := strconv.Atoi(event.Postback.Params.Time[3:])
 					total_min := hour*60 + min
-					results, err := getTsundokus(userID)
+					results, err := util.GetTsundokus(DB, userID)
 					if err != nil {
 						log.Println(err)
 						return
@@ -655,48 +655,6 @@ func main() {
 	if err := http.ListenAndServe(":"+os.Getenv("PORT"), nil); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func getTsundokus(userID int) ([]model.Tsundoku, error) {
-	var results []model.Tsundoku
-	rows, err := DB.Query("select * from tsundokus where user_id = $1;", userID)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	for rows.Next() {
-		var result model.Tsundoku
-		nullAuthor := new(sql.NullString)
-		nullURL := new(sql.NullString)
-		nullDeadLine := new(pq.NullTime)
-		nullRequiredTime := new(sql.NullString)
-		nullCreatedAt := new(pq.NullTime)
-		err := rows.Scan(&result.ID, &result.UserID, &result.Category, &result.Title, nullAuthor, nullURL, nullDeadLine, nullRequiredTime, nullCreatedAt)
-		if err != nil {
-			return nil, err
-		}
-		if nullAuthor.Valid {
-			result.Author = nullAuthor.String
-		}
-		if nullURL.Valid {
-			result.URL = nullURL.String
-		}
-		if nullDeadLine.Valid {
-			result.Deadline = nullDeadLine.Time
-		}
-		if nullRequiredTime.Valid {
-			result.RequiredTime = nullRequiredTime.String
-		}
-		if nullCreatedAt.Valid {
-			result.CreatedAt = nullCreatedAt.Time
-		}
-		results = append(results, result)
-
-	}
-	if err = rows.Err(); err != nil {
-		return nil, err
-	}
-	return results, nil
 }
 
 func countRequiredTime(url string) (int, string, error) {
