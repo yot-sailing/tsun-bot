@@ -94,9 +94,9 @@ func main() {
 							"this is a buttons template",
 							linebot.NewButtonsTemplate(
 								"https://ddnavi.com/wp-content/uploads/2020/04/tsundoku.jpg",
-								"積ん読消化！！",
-								"何時間何分暇か選んでね",
-								linebot.NewDatetimePickerAction("暇な時間入力", "time", "time", "00:00", "23:59", "00:00"),
+								"積ん読を消化する！",
+								"何時間何分暇か選んでください",
+								linebot.NewDatetimePickerAction("暇な時間を入力", "time", "time", "00:00", "23:59", "00:00"),
 							),
 						)
 
@@ -108,7 +108,7 @@ func main() {
 						resp := linebot.NewTemplateMessage(
 							"this is a confirm template",
 							linebot.NewConfirmTemplate(
-								"本を積みますか?サイトを積みますか??",
+								"本を積みますか？サイトを積みますか？",
 								linebot.NewMessageAction("本", "本"),
 								linebot.NewMessageAction("サイト", "サイト"),
 							),
