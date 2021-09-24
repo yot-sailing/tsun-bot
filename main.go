@@ -140,23 +140,23 @@ func main() {
 									"type": "carousel",
 									"contents": [`)
 						for i, a := range results {
-							column1 := ""
-							column2 := ""
+							var column1, column1Value, column2, column2Value string
 							image_url := "https://pakutaso.cdn.rabify.me/shared/img/thumb/macbookFTHG1289.jpg?d=350" // pc用
 							if a.Category == "book" {                                                                // if book
 								column1 = "著者"
 								column2 = "この日までに読む"
 								if a.Author == "" {
-									a.URL = "著者が入力されていません"
+									column1Value = "著者が入力されていません"
 								} else {
-									a.URL = a.Author //ここちょっと汚い
+									column1Value = a.Author //ここちょっと汚い
 								}
 								image_url = "https://imgs.u-note.me/note/caption/47488447.jpg"
-								a.RequiredTime = a.Deadline.String()[:10]
+								column2Value = a.Deadline.String()[:10]
 							} else { // if site
 								column1 = "URL"
+								column1Value = a.URL
 								column2 = "読了に必要な時間"
-								a.RequiredTime = a.RequiredTime + "分"
+								column2Value = a.RequiredTime + "分"
 							}
 							jsonData += (`
 								{
@@ -199,7 +199,7 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  "text": "` + a.URL + `",
+											  "text": "` + column1Value + `",
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
@@ -245,7 +245,7 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  "text": "` + a.RequiredTime + `" ,
+											  "text": "` + column2Value + `" ,
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
