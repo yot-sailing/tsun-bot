@@ -367,6 +367,7 @@ func main() {
 						}
 					} else if strings.Contains(message.Text, "tsundokuID") {
 						log.Println(message.Text)
+						log.Println(message.Text[39 : len(message.Text)-1])
 						log.Println(len(message.Text))
 						tsum_del, _ := strconv.Atoi(message.Text[39 : len(message.Text)-1])
 						log.Println(tsum_del)
