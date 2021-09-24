@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"main/model"
 	"net/http"
 	"os"
 	"strconv"
@@ -22,33 +23,9 @@ import (
 	"golang.org/x/net/html/charset"
 )
 
-type Tsundoku struct {
-	ID           int
-	UserID       int
-	Category     string
-	Title        string
-	Author       string
-	URL          string
-	Deadline     time.Time
-	RequiredTime string
-	CreatedAt    time.Time
-}
-
-type User struct {
-	DisplayName   string
-	UserID        string
-	Language      string
-	PictureURL    string
-	StatusMessage string
-}
-type Book struct {
-	Title  string
-	Author string
-}
-
 var DB *sql.DB
 
-var tsun_book Book
+var tsun_book model.Book
 
 func main() {
 	var err error
@@ -95,7 +72,7 @@ func main() {
 						defer resp.Body.Close()
 
 						byteArray, _ := ioutil.ReadAll(resp.Body)
-						var user User
+						var user model.User
 						err = json.Unmarshal(byteArray, &user)
 						displayName := user.DisplayName
 						createdAt := time.Now().String() //ここちょっと怪しみ
@@ -466,7 +443,7 @@ func main() {
 					return
 				}
 				if event.Postback.Data == "time" {
-					limited_results := []Tsundoku{}
+					limited_results := []model.Tsundoku{}
 					hour, _ := strconv.Atoi(event.Postback.Params.Time[:2])
 					min, _ := strconv.Atoi(event.Postback.Params.Time[3:])
 					total_min := hour*60 + min
@@ -670,7 +647,7 @@ func main() {
 						log.Print(err)
 					}
 					title_added = false
-					tsun_book = Book{}
+					tsun_book = model.Book{}
 				}
 			}
 		}
@@ -680,15 +657,15 @@ func main() {
 	}
 }
 
-func getTsundokus(userID int) ([]Tsundoku, error) {
-	var results []Tsundoku
+func getTsundokus(userID int) ([]model.Tsundoku, error) {
+	var results []model.Tsundoku
 	rows, err := DB.Query("select * from tsundokus where user_id = $1;", userID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var result Tsundoku
+		var result model.Tsundoku
 		nullAuthor := new(sql.NullString)
 		nullURL := new(sql.NullString)
 		nullDeadLine := new(pq.NullTime)
