@@ -1,10 +1,17 @@
 package util
 
 import (
+	"bytes"
 	"database/sql"
+	"io/ioutil"
 	"main/model"
+	"net/http"
+	"unicode/utf8"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/lib/pq"
+	"github.com/saintfish/chardet"
+	"golang.org/x/net/html/charset"
 )
 
 func GetTsundokus(DB *sql.DB, userID int) ([]model.Tsundoku, error) {
@@ -47,4 +54,40 @@ func GetTsundokus(DB *sql.DB, userID int) ([]model.Tsundoku, error) {
 		return nil, err
 	}
 	return results, nil
+}
+
+func CountRequiredTime(url string) (int, string, error) {
+	res, err := http.Get(url)
+	if err != nil {
+		return 0, "", err
+	}
+	defer res.Body.Close()
+	buf, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return 0, "", nil
+	}
+
+	det := chardet.NewTextDetector()
+	detResult, err := det.DetectBest(buf)
+
+	if err != nil {
+		return 0, "", err
+	}
+
+	bReader := bytes.NewReader(buf)
+	reader, err := charset.NewReaderLabel(detResult.Charset, bReader)
+
+	if err != nil {
+		return 0, "", nil
+	}
+
+	doc, err := goquery.NewDocumentFromReader(reader)
+	if err != nil {
+		return 0, "", nil
+	}
+	doc.Find("*:empty").Remove()
+	doc.Find("script").Remove()
+	doc.Find("style").Remove()
+	totalContents := utf8.RuneCountInString(doc.Find("body").Text())
+	return totalContents / 500, doc.Find("title").Text(), nil
 }

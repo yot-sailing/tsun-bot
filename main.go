@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -13,14 +12,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode/utf8"
 
 	"database/sql"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/line/line-bot-sdk-go/linebot"
-	"github.com/saintfish/chardet"
-	"golang.org/x/net/html/charset"
 )
 
 var DB *sql.DB
@@ -281,7 +276,7 @@ func main() {
 										"action": {
 											"type": "message",
 											"label": "読んだ",
-											"text": "積ん読を1つ消化しました！"
+											"text": "積ん読を1つ消化しました！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
 										}
 										},
 									{
@@ -306,7 +301,7 @@ func main() {
 									"action": {
 										"type": "message",
 										"label": "読んだ",
-										"text": "積ん読を1つ消化しました！"
+										"text": "積ん読を1つ消化しました！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
 									}
 								},
 								{
@@ -334,19 +329,19 @@ func main() {
 							fmt.Println(err4)
 						}
 					} else if message.Text == "サイト" {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("URLちょうだい！")).Do(); err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("URLを送ってください")).Do(); err != nil {
 							log.Print(err)
 						}
 						want_added = true
 					} else if message.Text == "本" {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("タイトルを教えて、著者もわかるなら改行して入力して")).Do(); err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("タイトルを教えてください(分かるのならば著者も改行して入力してください)")).Do(); err != nil {
 							log.Print(err)
 						}
 						want_added = true
 						//ここで 積ん読追加のAPIを呼ぶ、著者とタイトル、どう判断すべきか分からんからタイトルだけで
 					} else if strings.Contains(message.Text, "http") {
 						tsumu_url := message.Text
-						requiredTime, title, err := countRequiredTime(tsumu_url)
+						requiredTime, title, err := util.CountRequiredTime(tsumu_url)
 						var requiredTimeString string
 						if err == nil {
 							requiredTimeString = strconv.Itoa(requiredTime)
@@ -361,13 +356,13 @@ func main() {
 							if err == sql.ErrNoRows {
 								log.Printf("I got err but not problem: %s", err)
 							} else {
-								if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できなかった、すまぬ")).Do(); err != nil {
+								if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加できませんでした、、")).Do(); err != nil {
 									log.Print(err)
 									return
 								}
 							}
 						}
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加しました！")).Do(); err != nil {
 							log.Print(err)
 						}
 					} else if strings.Contains(message.Text, "tsundokuID") {
@@ -378,7 +373,7 @@ func main() {
 						result, err := DB.Exec("DELETE FROM tsundokus WHERE id = $1;", strconv.Itoa(tsum_del)) //user_idを指定することでそのuserしか消せないようになるはず??
 						if err != nil {
 							log.Println(err)
-							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("消せなかった、すまぬ")).Do(); err != nil {
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("消せませんでした、、")).Do(); err != nil {
 								log.Print(err)
 							}
 							return
@@ -386,7 +381,7 @@ func main() {
 						_, err = result.RowsAffected()
 						if err != nil {
 							log.Println("Request error:", err)
-							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("消せなかった、すまぬ")).Do(); err != nil {
+							if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("消せませんでした、、")).Do(); err != nil {
 								log.Print(err)
 							}
 							return
@@ -414,7 +409,7 @@ func main() {
 								linebot.NewButtonsTemplate(
 									"https://ddnavi.com/wp-content/uploads/2020/04/tsundoku.jpg",
 									"本をいつまでに読むか決めます",
-									"何月何日に読み終えたいか教えてね",
+									"何月何日までに読み終えたいか教えてください",
 									linebot.NewDatetimePickerAction("Date", "date", "date", "2021-09-18", "2025-07-02", "2021-09-18"),
 								),
 							)
@@ -463,7 +458,7 @@ func main() {
 					}
 
 					if len(limited_results) == 0 {
-						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(strconv.Itoa(total_min)+"分以内で読めるサイトは無いわ、、")).Do(); err != nil {
+						if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(strconv.Itoa(total_min)+"分以内で読めるサイトはありません、、")).Do(); err != nil {
 							log.Print(err)
 						}
 						return
@@ -474,7 +469,7 @@ func main() {
 									"contents": [`)
 					for i, a := range limited_results {
 						column1 := "URL"
-						column2 := "total time"
+						column2 := "読了に必要な時間"
 						image_url := "https://pakutaso.cdn.rabify.me/shared/img/thumb/macbookFTHG1289.jpg?d=350" // pc用
 						jsonData += (`
 								{
@@ -536,7 +531,7 @@ func main() {
 										  "contents": [
 											{
 											  "type": "text",
-											  "text": "created",
+											  "text": "作成日時",
 											  "color": "#aaaaaa",
 											  "size": "sm",
 											  "flex": 2,
@@ -544,7 +539,7 @@ func main() {
 											},
 											{
 											  "type": "text",
-											  "text" : "` + a.CreatedAt.String()[:10] + `", 
+											  "text" : "` + a.CreatedAt.String()[:10] + `",
 											  "wrap": true,
 											  "color": "#666666",
 											  "size": "sm",
@@ -601,7 +596,7 @@ func main() {
 										"height": "sm",
 										"action": {
 											"type": "message",
-											"label": "もう読んだよ",
+											"label": "読んだ",
 											"text": "積ん読1つ消化！！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
 										}
 										},
@@ -643,7 +638,7 @@ func main() {
 							}
 						}
 					}
-					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加したよ、はよ消化してね")).Do(); err != nil {
+					if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage("追加しました！")).Do(); err != nil {
 						log.Print(err)
 					}
 					title_added = false
@@ -655,40 +650,4 @@ func main() {
 	if err := http.ListenAndServe(":"+os.Getenv("PORT"), nil); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func countRequiredTime(url string) (int, string, error) {
-	res, err := http.Get(url)
-	if err != nil {
-		return 0, "", err
-	}
-	defer res.Body.Close()
-	buf, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		return 0, "", nil
-	}
-
-	det := chardet.NewTextDetector()
-	detResult, err := det.DetectBest(buf)
-
-	if err != nil {
-		return 0, "", err
-	}
-
-	bReader := bytes.NewReader(buf)
-	reader, err := charset.NewReaderLabel(detResult.Charset, bReader)
-
-	if err != nil {
-		return 0, "", nil
-	}
-
-	doc, err := goquery.NewDocumentFromReader(reader)
-	if err != nil {
-		return 0, "", nil
-	}
-	doc.Find("*:empty").Remove()
-	doc.Find("script").Remove()
-	doc.Find("style").Remove()
-	totalContents := utf8.RuneCountInString(doc.Find("body").Text())
-	return totalContents / 500, doc.Find("title").Text(), nil
 }
