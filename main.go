@@ -280,8 +280,8 @@ func main() {
 										"height": "sm",
 										"action": {
 											"type": "message",
-											"label": "もう読んだよ",
-											"text": "積ん読1つ消化！！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
+											"label": "読んだ",
+											"text": "積ん読を1つ消化しました！"
 										}
 										},
 									{
@@ -305,8 +305,8 @@ func main() {
 									"height": "sm",
 									"action": {
 										"type": "message",
-										"label": "もう読んだよ",
-										"text": "積ん読1つ消化！！(tsundokuID : ` + strconv.Itoa(a.ID) + `)"
+										"label": "読んだ",
+										"text": "積ん読を1つ消化しました！"
 									}
 								},
 								{
